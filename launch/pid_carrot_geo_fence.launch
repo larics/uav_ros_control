@@ -1,0 +1,27 @@
+<launch>
+    <arg name="namespace"   default="$(env UAV_NAMESPACE)"/>
+    <arg name="carrot_out"     default="carrot/trajectory"/>
+    <arg name="pid_in"          default="carrot/trajectory"/>
+    <arg name="odometry"            default="mavros/global_position/local"/>
+    <arg name="msf_callback_enable"     default="false"/>
+    <arg name="ch_num"    default="1"/>
+
+    <include file="$(find uav_ros_control)/launch/carrot_reference.launch">
+        <arg name="namespace" value="$(arg nam espace)"/>
+        <arg name="ref" value="$(arg carrot_out)"/>
+        <arg name="odom" value="$(arg odometry)"/>
+    </include>
+
+    <include file="$(find uav_ros_control)/launch/position_control.launch">
+        <arg name="msf_callback_enable"     value="$(arg msf_callback_enable)"/>
+        <arg name="namespace" value="$(arg namespace)"/>
+        <arg name="traj_ref" value="$(arg pid_in)"/>
+        <arg name="odom" value="$(arg odometry)"/>
+    </include>
+
+    <param name="$(arg namespace)/gps_constraints_filename" value="$(find uav_ros_control)/config/reference/ch$(arg ch_num)_gps_constraints.yaml"/>
+    <node name="geo_fence" pkg="uav_ros_control" type="geo_fence_node" output="screen" ns="$(arg namespace)">
+        <remap from="geofence_in" to="$(arg carrot_out)"/>
+        <remap from="geofence_out" to="$(arg pid_in)"/>
+    </node>
+</launch>

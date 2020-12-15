@@ -1,0 +1,13 @@
+gps_constraints:
+  - lat: 24.41773
+    lon: 54.43563
+    alt: 7
+  - lat: 24.41762
+    lon: 54.43557
+    alt: 7
+  - lat: 24.41757
+    lon: 54.43578
+    alt: 7
+  - lat: 24.41769
+    lon: 54.4358
+    alt: 7

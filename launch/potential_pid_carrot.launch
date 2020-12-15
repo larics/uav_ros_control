@@ -1,0 +1,46 @@
+<launch>
+    <arg name="namespace" default="$(env UAV_NAMESPACE)"/>
+    <arg name="carrot_out" default="carrot/trajectory"/>
+    <arg name="potfield_in" default="carrot/trajectory"/>
+    <arg name="potfield_out" default="potential_fields/trajectory"/>
+    <arg name="pid_in" default="potential_fields/trajectory"/>
+    <arg name="odometry" default="msf_core/odometry"/>
+
+    <!-- Velodyne to MPC state -->
+    <node name="state_to_leddar" pkg="tf" type="static_transform_publisher" 
+        args="0.08 0 -0.1578 0. 0.1323284641020683 3.141592653589793 state velodyne 100" />
+            
+    <arg name="laser_points" default="/leddar_points"/>
+    
+    <!-- PID Carrot stack -->
+    <include file="$(find uav_ros_control)/launch/pid_carrot.launch">
+        <arg name="namespace" value="$(arg namespace)"/>
+        <arg name="carrot_out" value="$(arg carrot_out)"/>
+        <arg name="pid_in" value="$(arg pid_in)"/>
+        <arg name="odometry" value="$(arg odometry)"/>
+        <arg name="msf_callback_enable" value="true"/>
+    </include>
+
+    <!-- Potential fields -->
+    <include file="$(find potential_fields)/launch/potential_fields.launch">
+        <arg name="potfield_in" value="$(arg potfield_in)"/>
+        <arg name="potfield_out" value="$(arg potfield_out)"/>
+        <arg name="odometry" value="$(arg odometry)"/>
+        <arg name="laser_points" value="$(arg laser_points)"/>
+        <!-- Potential fields arguments -->
+        <arg name="frame_id" value="/bebop/base_link" />
+        <arg name="lim_x" value="1.5" />
+        <arg name ="lim_y" value="1.5" />
+        <arg name ="lim_z" value="0.5" />
+        <arg name ="rate" value = "20" />
+        <arg name ="segment_distance" value = "0.65" />
+        <arg name ="v_max" value = "1.0" />
+        <arg name ="gain_repulsive" value = "2.5" />
+        <arg name ="gain_attractive" value = "1.0" />
+        <arg name ="kr" value = "10.0" />
+        <arg name ="dmax" value = "3" />
+        <arg name ="yaw_factor" value = "0.5" />
+        <arg name ="r" value = "0.8" />
+    </include>
+
+</launch>
