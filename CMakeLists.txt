@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(uav_ros_control)
 
-find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_control_msgs dynamic_reconfigure
+find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure
                                         mavros)
 
 generate_dynamic_reconfigure_options(config/control/PositionControlParameters.cfg

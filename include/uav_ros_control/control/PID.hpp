@@ -1,7 +1,7 @@
 #ifndef PID_H
 #define PID_H
 
-#include <uav_ros_control_msgs/PIDController.h>
+#include <uav_ros_msgs/PIDController.h>
 #include <ros/ros.h>
 #include <string>
 
@@ -125,7 +125,7 @@ public:
    *
    * @param msg
    */
-  void create_msg(uav_ros_control_msgs::PIDController &msg);
+  void create_msg(uav_ros_msgs::PIDController &msg);
 
   /**
    * @brief Performs a PID computation and returns a control value based on

@@ -161,7 +161,7 @@ void PID::get_pid_values(double &up_, double &ui_, double &ud_, double &u_)
   u_ = u;
 }
 
-void PID::create_msg(uav_ros_control_msgs::PIDController &msg)
+void PID::create_msg(uav_ros_msgs::PIDController &msg)
 {
   msg.ref = ref;
   msg.meas = meas;

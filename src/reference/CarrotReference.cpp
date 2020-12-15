@@ -138,8 +138,8 @@ bool uav_reference::CarrotReference::landServiceCb(std_srvs::SetBool::Request &r
 }
 
 bool uav_reference::CarrotReference::takeoffServiceCb(
-  uav_ros_control_msgs::TakeOff::Request &request,
-  uav_ros_control_msgs::TakeOff::Response &response)
+  uav_ros_msgs::TakeOff::Request &request,
+  uav_ros_msgs::TakeOff::Response &response)
 {
   const auto set_response = [&response](bool success) {
     response.success = success;
