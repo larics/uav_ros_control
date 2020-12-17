@@ -4,8 +4,9 @@ project(uav_ros_control)
 find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure
                                         mavros)
 
-generate_dynamic_reconfigure_options(config/control/PositionControlParameters.cfg
-                                     config/control/DistanceControlParameters.cfg)
+generate_dynamic_reconfigure_options(
+  config/control/PositionControlParameters.cfg
+  config/control/DistanceControlParameters.cfg)
 
 catkin_package(
   INCLUDE_DIRS
@@ -18,7 +19,9 @@ catkin_package(
   uav_ros_msgs
   mavros)
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS})
+include_directories(
+  include ${catkin_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS}
+  ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 
 # PID controller library
 add_library(uav_pid src/control/PID.cpp)
@@ -41,6 +44,8 @@ target_link_libraries(reference_lib ${catkin_LIBRARIES} nfilt uav_pid yaml-cpp)
 file(GLOB_RECURSE controllers_SRC "src/control/*.cpp")
 add_library(control_lib ${controllers_SRC})
 target_link_libraries(control_lib ${catkin_LIBRARIES} nfilt)
+add_dependencies(control_lib ${catkin_EXPORTED_TARGETS}
+                 ${PROJECT_NAME}_gencfg)
 
 # Carrot node
 add_executable(carrot_reference_node nodes/reference/CarrotReferenceNode.cpp)
