@@ -6,4 +6,5 @@
 
 ## Summary
 
-This package contains UAV control algorithms
+The main control package [uav_ros_stack](https://github.com/lmark1/uav_ros_stack).  
+It contains UAV control algorithms suitable for use with Ardupilot or PX4 platforms. 
