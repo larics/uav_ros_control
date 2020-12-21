@@ -40,7 +40,7 @@ echo "running the main install.sh"
 gitman update
 
 # checkout the SHA
-cd ~/uav_core/.gitman/$PACKAGE_NAME
+cd ~/uav_ros_stack/.gitman/$PACKAGE_NAME
 git checkout "$SHA"
 
 mkdir -p ~/catkin_ws/src
