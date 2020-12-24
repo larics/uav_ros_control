@@ -8,7 +8,7 @@
 #include <std_srvs/SetBool.h>
 #include <uav_ros_msgs/TakeOff.h>
 #include <mavros_msgs/State.h>
-#include <uav_ros_control/filters/Util.hpp>
+#include <uav_ros_lib/topic_handler.hpp>
 #include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
 
 namespace uav_reference {

@@ -2,7 +2,7 @@
 #define GLOBAL_TO_LOCAL_H
 
 #include <ros/ros.h>
-#include <uav_ros_control/filters/Util.hpp>
+#include <uav_ros_lib/topic_handler.hpp>
 #include <Eigen/Dense>
 #include <GeographicLib/Geocentric.hpp>
 #include <mavros/frame_tf.h>
