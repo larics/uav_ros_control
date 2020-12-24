@@ -1,34 +1,27 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(uav_ros_control)
 
-find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure
-                                        mavros uav_ros_lib)
+find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure mavros
+                                        uav_ros_lib)
 
-generate_dynamic_reconfigure_options(
-  config/control/PositionControlParameters.cfg
-  config/control/DistanceControlParameters.cfg)
+generate_dynamic_reconfigure_options(config/control/PositionControlParameters.cfg
+                                     config/control/DistanceControlParameters.cfg)
 
 catkin_package(
   INCLUDE_DIRS
   include
   LIBRARIES
   uav_pid
-  uav_kalman
   CATKIN_DEPENDS
   uav_ros_msgs
   mavros)
 
-include_directories(
-  include ${catkin_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS}
-  ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+include_directories(include ${catkin_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS}
+                    ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 
 # PID controller library
 add_library(uav_pid src/control/PID.cpp)
 target_link_libraries(uav_pid ${catkin_LIBRARIES})
-
-# Kalman filter library
-add_library(uav_kalman src/filters/KalmanFilter.cpp)
-target_link_libraries(uav_kalman ${catkin_LIBRARIES})
 
 # References library
 file(GLOB_RECURSE reference_SRC "src/reference/*.cpp")
@@ -39,8 +32,7 @@ target_link_libraries(reference_lib ${catkin_LIBRARIES} uav_pid yaml-cpp)
 file(GLOB_RECURSE controllers_SRC "src/control/*.cpp")
 add_library(control_lib ${controllers_SRC})
 target_link_libraries(control_lib ${catkin_LIBRARIES})
-add_dependencies(control_lib ${catkin_EXPORTED_TARGETS}
-                 ${PROJECT_NAME}_gencfg)
+add_dependencies(control_lib ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 # Carrot node
 add_executable(carrot_reference_node nodes/reference/CarrotReferenceNode.cpp)
