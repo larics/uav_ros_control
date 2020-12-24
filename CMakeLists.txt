@@ -13,7 +13,6 @@ catkin_package(
   include
   LIBRARIES
   uav_pid
-  nfilt
   uav_kalman
   CATKIN_DEPENDS
   uav_ros_msgs
@@ -27,10 +26,6 @@ include_directories(
 add_library(uav_pid src/control/PID.cpp)
 target_link_libraries(uav_pid ${catkin_LIBRARIES})
 
-# Nonlinear filters library
-add_library(nfilt src/filters/NonlinearFilters.cpp)
-target_link_libraries(nfilt ${catkin_LIBRARIES})
-
 # Kalman filter library
 add_library(uav_kalman src/filters/KalmanFilter.cpp)
 target_link_libraries(uav_kalman ${catkin_LIBRARIES})
@@ -38,12 +33,12 @@ target_link_libraries(uav_kalman ${catkin_LIBRARIES})
 # References library
 file(GLOB_RECURSE reference_SRC "src/reference/*.cpp")
 add_library(reference_lib ${reference_SRC})
-target_link_libraries(reference_lib ${catkin_LIBRARIES} nfilt uav_pid yaml-cpp)
+target_link_libraries(reference_lib ${catkin_LIBRARIES} uav_pid yaml-cpp)
 
 # Controller library
 file(GLOB_RECURSE controllers_SRC "src/control/*.cpp")
 add_library(control_lib ${controllers_SRC})
-target_link_libraries(control_lib ${catkin_LIBRARIES} nfilt)
+target_link_libraries(control_lib ${catkin_LIBRARIES})
 add_dependencies(control_lib ${catkin_EXPORTED_TARGETS}
                  ${PROJECT_NAME}_gencfg)
 
@@ -57,11 +52,11 @@ target_link_libraries(pid_cascade_node control_lib)
 
 # Distance control node
 add_executable(distance_control_node nodes/control/DistanceControlNode.cpp)
-target_link_libraries(distance_control_node control_lib nfilt)
+target_link_libraries(distance_control_node control_lib)
 
 # Geo-fencing node
 add_executable(geo_fence_node nodes/reference/GeoFenceNode.cpp)
-target_link_libraries(geo_fence_node reference_lib ${catkin_LIBRARIES} nfilt)
+target_link_libraries(geo_fence_node reference_lib ${catkin_LIBRARIES})
 
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})

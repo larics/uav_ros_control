@@ -5,7 +5,7 @@
  *      Author: lmark
  */
 #include <uav_ros_control/control/ControlBase.hpp>
-#include <uav_ros_control/filters/NonlinearFilters.hpp>
+#include <uav_ros_lib/nonlinear_filters.hpp>
 
 #include <mavros_msgs/AttitudeTarget.h>
 #include <nav_msgs/Odometry.h>
