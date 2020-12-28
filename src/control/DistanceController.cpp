@@ -1,4 +1,5 @@
 #include <uav_ros_control/control/DistanceController.hpp>
+#include <uav_ros_lib/ros_convert.hpp>
 #include <uav_ros_lib/nonlinear_filters.hpp>
 
 #include <ros/ros.h>
@@ -106,7 +107,7 @@ void dist_control::DistanceControl::distanceSpOffsetCb(
 void dist_control::DistanceControl::normalCb(
   const geometry_msgs::PoseStampedConstPtr &message)
 {
-  _planeYaw = util::calculateYaw(message->pose.orientation.x,
+  _planeYaw = ros_convert::calculateYaw(message->pose.orientation.x,
     message->pose.orientation.y,
     message->pose.orientation.z,
     message->pose.orientation.w);
@@ -115,7 +116,7 @@ void dist_control::DistanceControl::normalCb(
   double xComponent = cos(_planeYaw);
   if (xComponent < 0) _planeYaw += M_PI;
 
-  _planeYaw = util::wrapMinMax(_planeYaw, -M_PI, M_PI);
+  _planeYaw = ros_convert::wrapMinMax(_planeYaw, -M_PI, M_PI);
 }
 
 void dist_control::DistanceControl::detectStateChange()

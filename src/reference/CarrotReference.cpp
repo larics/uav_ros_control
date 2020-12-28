@@ -1,4 +1,4 @@
-#include <uav_ros_lib/nonlinear_filters.hpp>
+#include <uav_ros_lib/ros_convert.hpp>
 #include <uav_ros_control/reference/CarrotReference.hpp>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/String.h>
@@ -196,7 +196,7 @@ void uav_reference::CarrotReference::positionRefCb(
 {
   if (_positionHold) {
     _carrotPoint = *posMsg;
-    _carrotYaw = util::calculateYaw(posMsg->transforms[0].rotation.x,
+    _carrotYaw = ros_convert::calculateYaw(posMsg->transforms[0].rotation.x,
       posMsg->transforms[0].rotation.y,
       posMsg->transforms[0].rotation.z,
       posMsg->transforms[0].rotation.w);
@@ -268,7 +268,7 @@ void uav_reference::CarrotReference::odomCb(const nav_msgs::OdometryConstPtr &ms
   double qw = msg->pose.pose.orientation.w;
 
   // Extract UAV yaw
-  _uavYaw = util::calculateYaw(qx, qy, qz, qw);
+  _uavYaw = ros_convert::calculateYaw(qx, qy, qz, qw);
 
   // Publish UAV yaw message
   std_msgs::Float64 uavYawMsg;
@@ -290,7 +290,7 @@ void uav_reference::CarrotReference::updateCarrotYaw()
 {
   // Update Carrot yaw angle and wrap to PI
   _carrotYaw += getYawSpManual();
-  _carrotYaw = util::wrapMinMax(_carrotYaw, -M_PI, M_PI);
+  _carrotYaw = ros_convert::wrapMinMax(_carrotYaw, -M_PI, M_PI);
 
   tf2::Quaternion q;
   q.setEulerZYX(_carrotYaw, 0, 0);

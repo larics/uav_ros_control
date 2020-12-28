@@ -5,7 +5,7 @@
  *      Author: lmark
  */
 #include <uav_ros_control/control/ControlBase.hpp>
-#include <uav_ros_lib/nonlinear_filters.hpp>
+#include <uav_ros_lib/ros_convert.hpp>
 
 #include <mavros_msgs/AttitudeTarget.h>
 #include <nav_msgs/Odometry.h>
@@ -61,7 +61,7 @@ void uav_controller::ControlBase::odomCb(const nav_msgs::OdometryConstPtr &messa
   _currentVelocity[1] = message->twist.twist.linear.y;
   _currentVelocity[2] = -message->twist.twist.linear.z;
 
-  _currentYaw = util::calculateYaw(message->pose.pose.orientation.x,
+  _currentYaw = ros_convert::calculateYaw(message->pose.pose.orientation.x,
     message->pose.pose.orientation.y,
     message->pose.pose.orientation.z,
     message->pose.pose.orientation.w);
@@ -79,7 +79,7 @@ void uav_controller::ControlBase::msfOdomCb(const nav_msgs::OdometryConstPtr &me
                         - sin(-_currentYaw) * message->twist.twist.linear.x;
   _currentVelocity[2] = message->twist.twist.linear.z;
 
-  _currentYaw = util::calculateYaw(message->pose.pose.orientation.x,
+  _currentYaw = ros_convert::calculateYaw(message->pose.pose.orientation.x,
     message->pose.pose.orientation.y,
     message->pose.pose.orientation.z,
     message->pose.pose.orientation.w);
