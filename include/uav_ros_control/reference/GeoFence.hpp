@@ -2,7 +2,7 @@
 #define GEO_FENCE_H
 
 #include <ros/ros.h>
-#include <uav_ros_control/reference/Global2Local.hpp>
+#include <uav_ros_lib/global_to_local.hpp>
 #include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
 #include <geometry_msgs/Vector3.h>
 #include <geometry_msgs/Twist.h>
@@ -136,7 +136,7 @@ private:
     geometry_msgs::Vector3 P1,
     geometry_msgs::Vector3 P2);
 
-  Global2Local _global_to_local;// Object for converting GPS points
+  tf_util::GlobalToLocal _global_to_local;// Object for converting GPS points
   geometry_msgs::Vector3 _last_valid_position;// Last received position within fence
   geometry_msgs::Vector3 _centroid;// Centroid of the allowed geo fence area
   std::vector<geometry_msgs::Vector3> _vertices;// GPS points definining fence polygon

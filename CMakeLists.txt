@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(uav_ros_control)
 
-find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure mavros
+find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure
                                         uav_ros_lib)
 
 generate_dynamic_reconfigure_options(config/control/PositionControlParameters.cfg
@@ -13,10 +13,9 @@ catkin_package(
   LIBRARIES
   uav_pid
   CATKIN_DEPENDS
-  uav_ros_msgs
-  mavros)
+  uav_ros_msgs)
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${GeographicLib_INCLUDE_DIRS}
+include_directories(include ${catkin_INCLUDE_DIRS}
                     ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 
 # PID controller library
