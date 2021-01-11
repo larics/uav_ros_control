@@ -46,6 +46,16 @@ public:
    */
   void resetVelocityPID();
 
+  /**
+   * Get yaw reference.
+   */
+  double getYawRef();
+
+  /**
+   * Calculate yaw rate setpoint.
+   */
+  double calculateYawRateSetpoint(double dt);
+
 private:
   /**
    * Reset integrator service callback.OS
@@ -94,6 +104,9 @@ private:
   /** PID controller for velocity along the y-axis */
   std::unique_ptr<PID> _velZPID;
 
+  /** PID Controller for yaw-rate */
+  std::unique_ptr<PID> _yawRatePID;
+
   /** Value from 0 to 1, hover thrust */
   double _hoverThrust = 0;
 
@@ -130,6 +143,11 @@ private:
  * Default position control program
  */
 void runDefault(uav_controller::CascadePID &cc, ros::NodeHandle &nh);
+
+/**
+ * Default position control program
+ */
+void runDefault_yawrate(uav_controller::CascadePID &cc, ros::NodeHandle &nh);
 }// namespace uav_controller
 
 #endif /** CASCADE_PID_H */
