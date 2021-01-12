@@ -31,13 +31,17 @@ It contains UAV control algorithms suitable for use with Ardupilot or PX4 platfo
   * Parameters **carrot_index** and **carrot_enable**
     * Specify joy button that enables RC UAV control
   * Service **takeoff**
+    * ```uav_ros_msgs::Takeoff```
     * UAV takes off to the desired height
   * Service **land**
+    * ```std_srvs::SetBool```
     * UAV lands at the current position
   * Service **position_hold**
+    * ```std_srvs::Empty```
     * When called UAV listens to commands from topic **position_hold/trajectory**
     * If **joy** topic receives any inputs UAV exits position hold and listens to RC inputs
   * Subscribed topic **joy**
+    * ```sensor_msgs::Joy```
     * Controls the UAV if button at **carrot_index** is pressed
   * Subscribed topic **odometry** 
     * ```nav_msgs::Odometry```
