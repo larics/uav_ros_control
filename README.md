@@ -9,3 +9,48 @@
 The main control package of the [uav_ros_stack](https://github.com/lmark1/uav_ros_stack).  
 
 It contains UAV control algorithms suitable for use with Ardupilot or PX4 platforms. 
+
+## Node description
+
+* **PositionControlNode** 
+  * An implementation of a cascade PID UAV control scheme
+  * Subscribed topic **odometry** 
+    * ```nav_msgs::Odometry```
+    * current UAV estimated odometry
+  * Subscribed topic **uav/trajectory_point** 
+    * ```trajectory_msgs::MultiDOFJointTrajectoryPoint``` 
+    * current UAV referent trajectory point
+  * Published topic **uav/attitude_target**
+    * ```mavros_msgs::AttitudeTarget```
+    * calculated UAV attitude and thrust target
+
+* **CarrotReferenceNode**
+  * Used for publishing trajectory setpoints either through RC control or published topic
+  * Parameter **manual_takeoff**
+    * Enables automatic takeoff if set to *true*
+  * Parameters **carrot_index** and **carrot_enable**
+    * Specify joy button that enables RC UAV control
+  * Service **takeoff**
+    * UAV takes off to the desired height
+  * Service **land**
+    * UAV lands at the current position
+  * Service **position_hold**
+    * When called UAV listens to commands from topic **position_hold/trajectory**
+    * If **joy** topic receives any inputs UAV exits position hold and listens to RC inputs
+  * Subscribed topic **joy**
+    * Controls the UAV if button at **carrot_index** is pressed
+  * Subscribed topic **odometry** 
+    * ```nav_msgs::Odometry```
+    * current UAV estimated odometry
+  * Subscribed topic **position_hold/trajectory** 
+    * ```trajectory_msgs::MultiDOFJointTrajectoryPoint``` 
+    * External UAV referent trajectory points
+    * Relevant when UAV is in position hold
+  * Published topic **carrot/trajectory** 
+    * ```trajectory_msgs::MultiDOFJointTrajectoryPoint``` 
+    * current UAV referent trajectory point
+  
+Both nodes are started with default configurations as follows:
+```bash
+export UAV_NAMESPACE=red; roslaunch uav_ros_control pid_carrot.launch
+```
