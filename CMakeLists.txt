@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10.0)
 project(uav_ros_control)
 
 find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure
-                                        uav_ros_lib)
+                                        uav_ros_lib mavros_msgs)
 
 generate_dynamic_reconfigure_options(config/control/PositionControlParameters.cfg
                                      config/control/DistanceControlParameters.cfg)
@@ -12,6 +12,7 @@ catkin_package(
   include
   LIBRARIES
   uav_pid
+  uav_util
   CATKIN_DEPENDS
   uav_ros_msgs)
 
@@ -21,6 +22,10 @@ include_directories(include ${catkin_INCLUDE_DIRS}
 # PID controller library
 add_library(uav_pid src/control/PID.cpp)
 target_link_libraries(uav_pid ${catkin_LIBRARIES})
+
+# uav_util library
+add_library(uav_util src/util/uav_util.cpp)
+target_link_libraries(uav_util ${catkin_LIBRARIES})
 
 # References library
 file(GLOB_RECURSE reference_SRC "src/reference/*.cpp")
