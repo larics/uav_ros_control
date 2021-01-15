@@ -96,5 +96,5 @@ bool uav_util::automatic_takeoff(ros::NodeHandle &nh,
   // Shutdown pub
   joy_pub.shutdown();
 
-  return false;
+  return true;
 }
