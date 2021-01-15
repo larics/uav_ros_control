@@ -27,7 +27,7 @@ bool uav_util::automatic_takeoff(ros::NodeHandle &nh,
   }
 
   // Initialize takeoff client
-  auto takeoff_client = nh.serviceClient<std_srvs::Empty>("takeoff");
+  auto takeoff_client = nh.serviceClient<uav_ros_msgs::TakeOff>("takeoff");
   if (!takeoff_client.exists()) {
     ROS_WARN_STREAM("[uav_util::automatic_takeoff] - " << takeoff_client.getService()
                                                        << " does not exist.");
@@ -75,7 +75,7 @@ bool uav_util::automatic_takeoff(ros::NodeHandle &nh,
   wait.sleep();
 
   uav_ros_msgs::TakeOff takeoff_request;
-  takeoff_request.request.rel_alt = 2;
+  takeoff_request.request.rel_alt = relative_altitude;
   call_success = takeoff_client.call(takeoff_request);
   if (!call_success) {
     ROS_WARN("[uav_util::automatic_takeoff] - call to takeoff service unsuccessful.");
