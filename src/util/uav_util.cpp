@@ -39,7 +39,7 @@ bool uav_util::automatic_takeoff(ros::NodeHandle &nh,
 
   // start automatic takeoff
   ROS_INFO("[uav_util::automatic_takeoff] - started");
-  ros::Duration wait(1.0);
+  ros::Duration wait(2.0);
 
   // Swith to GUIDED mode
   mavros_msgs::SetMode guided_request;
