@@ -16,4 +16,10 @@
   <run_depend>uav_ros_lib</run_depend>
   <run_depend>mavros_msgs</run_depend>
 
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <uav_ros_control plugin="${prefix}/plugins.xml"/>
+    
+  </export>
+
 </package>

@@ -1,0 +1,27 @@
+<launch>
+
+  <arg name="namespace" default="$(env UAV_NAMESPACE)"/>
+  <arg name="carrot_out" default="carrot/trajectory"/>
+  <arg name="mpc_in" default="carrot/trajectory"/>
+  <arg name="odometry" default="mavros/global_position/local"/>
+  <arg name="mpc_config" default="$(find uav_ros_control)/config/control/mpc_config.yaml"/>
+  <arg name="manual_takeoff"  default="true"/>
+  <node name="control_manager" pkg="uav_ros_control" type="control_manager" ns="$(arg namespace)">
+
+    <!-- Load Private config files -->
+    <rosparam command="load" file="$(arg mpc_config)"/>
+
+    <!-- Remap topic names -->
+    <remap from="uav/trajectory" to="$(arg mpc_in)" />
+    <remap from="odometry" to="$(arg odometry)" />
+
+  </node>
+
+  <include file="$(find uav_ros_control)/launch/carrot_reference.launch">
+        <arg name="namespace" value="$(arg namespace)"/>
+        <arg name="ref" value="$(arg carrot_out)"/>
+        <arg name="odom" value="$(arg odometry)"/>
+        <arg name="manual_takeoff"  default="$(arg manual_takeoff)"/>
+  </include>
+
+</launch>

@@ -1,8 +1,15 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(uav_ros_control)
 
-find_package(catkin REQUIRED COMPONENTS roscpp uav_ros_msgs dynamic_reconfigure
-                                        uav_ros_lib mavros_msgs uav_ros_msgs)
+find_package(
+  catkin REQUIRED
+  COMPONENTS roscpp
+             uav_ros_msgs
+             dynamic_reconfigure
+             uav_ros_lib
+             mavros_msgs
+             uav_ros_msgs
+             pluginlib)
 
 generate_dynamic_reconfigure_options(config/control/PositionControlParameters.cfg
                                      config/control/DistanceControlParameters.cfg)
@@ -54,5 +61,27 @@ target_link_libraries(distance_control_node control_lib)
 add_executable(geo_fence_node nodes/reference/GeoFenceNode.cpp)
 target_link_libraries(geo_fence_node reference_lib ${catkin_LIBRARIES})
 
-install(DIRECTORY include/${PROJECT_NAME}/
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+# Model Predictive Control library
+add_library(uav_mpc src/control/ModelPredictiveControl.cpp)
+target_link_libraries(uav_mpc ${catkin_LIBRARIES})
+
+# Control manager node
+add_executable(control_manager nodes/control/ControlManagerNode.cpp)
+target_link_libraries(control_manager ${catkin_LIBRARIES})
+
+install(
+  TARGETS uav_mpc pid_cascade_node carrot_reference_node distance_control_node
+          geo_fence_node
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+# Mark cpp header files for installation
+install(
+  DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING
+  PATTERN "*.hpp"
+  PATTERN ".svn" EXCLUDE)
+
+install(FILES plugins.xml DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
