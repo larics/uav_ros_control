@@ -39,23 +39,22 @@ file(GLOB_RECURSE reference_SRC "src/reference/*.cpp")
 add_library(reference_lib ${reference_SRC})
 target_link_libraries(reference_lib ${catkin_LIBRARIES} uav_pid yaml-cpp)
 
-# Controller library
-file(GLOB_RECURSE controllers_SRC "src/control/*.cpp")
-add_library(control_lib ${controllers_SRC})
-target_link_libraries(control_lib ${catkin_LIBRARIES})
-add_dependencies(control_lib ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
-
 # Carrot node
 add_executable(carrot_reference_node nodes/reference/CarrotReferenceNode.cpp)
 target_link_libraries(carrot_reference_node reference_lib)
 
 # PID cascade node
-add_executable(pid_cascade_node nodes/control/PositionControlNode.cpp)
-target_link_libraries(pid_cascade_node control_lib)
+add_executable(pid_cascade_node nodes/control/PositionControlNode.cpp
+                                src/control/CascadePID.cpp src/control/ControlBase.cpp)
+target_link_libraries(pid_cascade_node ${catkin_LIBRARIES} uav_pid)
+add_dependencies(pid_cascade_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 # Distance control node
-add_executable(distance_control_node nodes/control/DistanceControlNode.cpp)
-target_link_libraries(distance_control_node control_lib)
+add_executable(
+  distance_control_node nodes/control/DistanceControlNode.cpp src/control/CascadePID.cpp
+                        src/control/DistanceController.cpp src/control/ControlBase.cpp)
+target_link_libraries(distance_control_node ${catkin_LIBRARIES} uav_pid)
+add_dependencies(distance_control_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 # Geo-fencing node
 add_executable(geo_fence_node nodes/reference/GeoFenceNode.cpp)
@@ -63,7 +62,15 @@ target_link_libraries(geo_fence_node reference_lib ${catkin_LIBRARIES})
 
 # Model Predictive Control library
 add_library(uav_mpc src/control/ModelPredictiveControl.cpp)
-target_link_libraries(uav_mpc ${catkin_LIBRARIES})
+target_link_libraries(uav_mpc ${catkin_LIBRARIES} control_cvx_wrapper)
+
+# CVXGEN MPC solver
+add_library(
+  control_mpc_cvxgen src/control/cvxgen/ldl.c src/control/cvxgen/matrix_support.c
+                     src/control/cvxgen/solver.c src/control/cvxgen/util.c)
+
+add_library(control_cvx_wrapper src/control/cvx_wrapper.cpp)
+target_link_libraries(control_cvx_wrapper control_mpc_cvxgen)
 
 # Control manager node
 add_executable(control_manager nodes/control/ControlManagerNode.cpp)

@@ -2,12 +2,18 @@
 #define MODEL_PREDICTIVE_CONTROL_HPP
 
 #include <uav_ros_control/control/controller_interface.hpp>
-
+#include <uav_ros_control/control/cvx_wrapper.hpp>
 namespace uav_ros_control {
 class ModelPredictiveControl : public controller_interface
 {
 public:
   
+  /**
+   * @brief Construct a new Model Predictive Control object.
+   * 
+   */
+  ModelPredictiveControl();
+
   /* Override all pure virtual methods */
   void initialize(const ros::NodeHandle &parent_nh,
     const std::string name,
@@ -23,6 +29,11 @@ public:
 
 private:
   /* A space for private variables and methods */
+
+  // Solver ptrs
+  std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_x;
+  std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_y;
+  std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_z;
 };
 }// namespace uav_ros_control
 
