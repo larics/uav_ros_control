@@ -1,5 +1,10 @@
 #include <uav_ros_control/control/ModelPredictiveControl.hpp>
 
+uav_ros_control::ModelPredictiveControl::ModelPredictiveControl()
+{
+  // TODO:
+}
+
 void uav_ros_control::ModelPredictiveControl::initialize(const ros::NodeHandle &parent_nh,
   const std::string name,
   const double uav_mass)
