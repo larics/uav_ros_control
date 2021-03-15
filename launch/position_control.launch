@@ -3,13 +3,14 @@
     <arg name="odom"        default="mavros/global_position/local"/>
     <arg name="traj_ref"    default="uav/trajectory"/>
     <arg name="msf_callback_enable"     default="false"/>
+    <arg name="default_params"     default="position_control.params.yaml"/>
 
     <group ns="$(arg namespace)">
 
         <!-- Load default PID parameters -->
         <group unless="$(arg msf_callback_enable)">
             <rosparam command="load"
-                file="$(find uav_ros_control)/config/control/position_control.params.yaml" />
+                file="$(find uav_ros_control)/config/control/$(arg default_params)" />
         </group>
 
         <!-- Load PID parameters used with MSF feedback -->
