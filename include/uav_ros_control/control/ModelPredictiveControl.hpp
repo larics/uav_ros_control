@@ -34,6 +34,8 @@ private:
   std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_x;
   std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_y;
   std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_z;
+
+  bool m_is_active = false;
 };
 }// namespace uav_ros_control
 

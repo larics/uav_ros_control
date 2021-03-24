@@ -1,2 +1,23 @@
 placeholder_a: 1
 placeholder_b: 2
+moj_param: 3
+
+solver_x:
+  dt1: 0.01
+  dt2: 0.2
+  p1: 1
+  p2: 2
+
+solver_y:
+  dt1: 0.01
+  dt2: 0.2
+  p1: 1
+  p2: 2
+
+solver_z:
+  dt1: 0.01
+  dt2: 0.2
+  p1: 1
+  p2: 2
+
+  
