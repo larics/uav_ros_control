@@ -15,7 +15,7 @@ public:
   ModelPredictiveControl();
 
   /* Override all pure virtual methods */
-  void initialize(const ros::NodeHandle &parent_nh,
+  void initialize(ros::NodeHandle &parent_nh,
     const std::string name,
     const double uav_mass) override;
   

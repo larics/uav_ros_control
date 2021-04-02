@@ -1,6 +1,10 @@
 placeholder_a: 1
 placeholder_b: 2
 moj_param: 3
+A: [1, 0.01, 0.00005, 0,
+ 0, 1, 0.01, 0.00005,
+ 0, 0, 1, 0.01,
+ 0, 0, 0, 1]
 
 solver_x:
   dt1: 0.01
