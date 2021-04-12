@@ -3,24 +3,23 @@
 
 uav_ros_control::ModelPredictiveControl::ModelPredictiveControl()
 {
-  // TODO: definirati konstruktor
+  ROS_INFO("ModelPredictiveControl::ModelPredictiveControl()");
+  // TODO:
 }
-
-
-
 
 void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent_nh,
   const std::string name,
   const double uav_mass)
 {
+  ROS_INFO("ModelPredictiveControl::initialize()");
   // TODO:
 
   // 0.step: Load all parameters
   double moj_param;
   Eigen::MatrixXd m_A_orig;
-  
+
   param_util::getParamOrThrow(parent_nh, "solver_x/dt1", moj_param);
-  m_A_orig = param_util::loadMatrixOrThrow(parent_nh, "model/translation/A", 4, 4);
+  m_A_orig = param_util::loadMatrixOrThrow(parent_nh, "A", 4, 4);
 
   // 1. step: Initialize m_solver private variables
   //  - m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>
@@ -35,7 +34,7 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent
     0.2,
     1,
     1);
-        
+
 
   m_solver_y = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(true,
     30,
@@ -45,7 +44,7 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent
     0.2,
     1,
     1);
-  
+
   m_solver_z = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(true,
     30,
     std::vector<double>{ 100, 50, 10 },
@@ -57,24 +56,14 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent
 }
 
 
-
-
-
-
 bool uav_ros_control::ModelPredictiveControl::activate(
   const mavros_msgs::AttitudeTargetConstPtr &last_attitude_cmd)
 {
   ROS_INFO("ModelPredictiveControl::activate");
   // TODO: You have to check if m_is_active is True.
-  if (m_is_active) {
-    return true;
-  }
-  return false;
+  if (!m_is_active) { m_is_active = true; }
+  return m_is_active;
 }
-
-
-
-
 
 
 void uav_ros_control::ModelPredictiveControl::deactivate()
@@ -85,19 +74,13 @@ void uav_ros_control::ModelPredictiveControl::deactivate()
 }
 
 
-
-
-
-
 const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::update(
   const nav_msgs::OdometryConstPtr &uav_state,
   const trajectory_msgs::MultiDOFJointTrajectoryPointConstPtr &last_position_cmd)
 {
   ROS_INFO_THROTTLE(5.0, "ModelPredictiveControl::update");
 
-  if (!m_is_active) {
-    return {};
-  }
+  if (!m_is_active) { return  mavros_msgs::AttitudeTarget{}; }
 
   // TODO: Do the control loop
 
@@ -109,25 +92,19 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   std::vector<double> Q, S;
   double u_x;
 
-  m_solver_x->setInitialState(initial_state);
-  m_solver_x->loadReference(reference);
-  m_solver_x->setLimits(max_speed, max_acc, max_u, max_du, dt1, dt2);
-  m_solver_x->setDt(dt, dt2);   // jeli to isto kao dt1 i dt2?
-  m_solver_x->setQ(Q);
-  m_solver_x->setS(S);
-  m_solver_x->setParams();
+  // TODO(bgrujic): The code below is commented out becasue it casues a segmentation fault
+  // m_solver_x->setInitialState(initial_state);
+  // m_solver_x->loadReference(reference);
+  // m_solver_x->setLimits(max_speed, max_acc, max_u, max_du, dt1, dt2);
+  // m_solver_x->setDt(dt, dt2);// jeli to isto kao dt1 i dt2?
+  // m_solver_x->setQ(Q);
+  // m_solver_x->setS(S);
+  // m_solver_x->setParams();
 
-  m_solver_x->solveCvx();
-  u_x = m_solver_x->getFirstControlInput();   // je li u_x akceleracija u x-smjeru?
-
-
-
+  // m_solver_x->solveCvx();
+  // u_x = m_solver_x->getFirstControlInput();// je li u_x akceleracija u x-smjeru?
 
 
-
-
-
-  
   // 2. Use the desired acceleration to calculate the orientation
   // 3. Use the desired acceleration to calculate thrust
 
@@ -135,10 +112,6 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   // 3. step - Fill out the atttitude_target object - VERY IMPORTANT!
   return attitude_target;
 }
-
-
-
-
 
 
 #include <pluginlib/class_list_macros.h>

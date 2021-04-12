@@ -6,7 +6,7 @@
   <arg name="odometry" default="mavros/global_position/local"/>
   <arg name="mpc_config" default="$(find uav_ros_control)/config/control/mpc_config.yaml"/>
   <arg name="manual_takeoff"  default="true"/>
-  <node name="control_manager" pkg="uav_ros_control" type="control_manager" ns="$(arg namespace)">
+  <node name="control_manager" pkg="uav_ros_control" type="control_manager" ns="$(arg namespace)" output="screen">
 
     <!-- Load Private config files -->
     <rosparam command="load" file="$(arg mpc_config)"/>
