@@ -25,14 +25,22 @@ uav_controller::ControlBase::ControlBase(ros::NodeHandle &nh)
 {
   ros::NodeHandle nhPrivate("~");
   bool msf_callback = false;
-  bool initialized = nhPrivate.getParam("msf_callback", msf_callback);
+  bool local_callback = false;
+  bool initialized = nhPrivate.getParam("msf_callback", msf_callback)
+                     && nhPrivate.getParam("local_callback", local_callback);
   if (!initialized) {
     ROS_FATAL("ControlBase - parameters not loaded.");
     throw std::runtime_error("Parameters not loaded");
   }
   auto odomCallback = &uav_controller::ControlBase::odomCb;
   if (msf_callback) {
+    ROS_INFO("ControlBase - MSF Callback enabled");
     odomCallback = &uav_controller::ControlBase::msfOdomCb;
+  } else if (local_callback) {
+    ROS_INFO("ControlBase - mavros/local_position/odom callback enabled");
+    odomCallback = &uav_controller::ControlBase::localOdomCb;
+  } else {
+    ROS_INFO("ControlBase - mavros/global_position/local callback enabled");
   }
 
   // Initialize all subscribers
@@ -60,6 +68,23 @@ void uav_controller::ControlBase::odomCb(const nav_msgs::OdometryConstPtr &messa
   _currentVelocity[0] = message->twist.twist.linear.x;
   _currentVelocity[1] = message->twist.twist.linear.y;
   _currentVelocity[2] = -message->twist.twist.linear.z;
+
+  _currentYaw = ros_convert::calculateYaw(message->pose.pose.orientation.x,
+    message->pose.pose.orientation.y,
+    message->pose.pose.orientation.z,
+    message->pose.pose.orientation.w);
+}
+
+void uav_controller::ControlBase::localOdomCb(const nav_msgs::OdometryConstPtr &message)
+{
+  ROS_INFO_THROTTLE(5.0, "Local");
+  _currentPosition[0] = message->pose.pose.position.x;
+  _currentPosition[1] = message->pose.pose.position.y;
+  _currentPosition[2] = message->pose.pose.position.z;
+
+  _currentVelocity[0] = message->twist.twist.linear.x;
+  _currentVelocity[1] = message->twist.twist.linear.y;
+  _currentVelocity[2] = message->twist.twist.linear.z;
 
   _currentYaw = ros_convert::calculateYaw(message->pose.pose.orientation.x,
     message->pose.pose.orientation.y,

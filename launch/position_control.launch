@@ -3,27 +3,20 @@
     <arg name="odom"                    default="mavros/global_position/local"/>
     <arg name="traj_ref"                default="uav/trajectory"/>
     <arg name="msf_callback_enable"     default="false"/>
-    <arg name="default_params"          default="position_control.params.yaml"/>
+    <arg name="local_callback_enable"   default="false"/>
+    <arg name="default_params"          default="$(find uav_ros_control)/config/control/position_control.params.yaml"/>
     <arg name="control_type"            default="pid_cascade_node"/>    
     <group ns="$(arg namespace)">
 
         <!-- Load default PID parameters -->
-        <group unless="$(arg msf_callback_enable)">
-            <rosparam command="load"
-                file="$(find uav_ros_control)/config/control/$(arg default_params)" />
-        </group>
-
-        <!-- Load PID parameters used with MSF feedback -->
-        <group if="$(arg msf_callback_enable)">
-            <rosparam command="load"
-                file="$(find uav_ros_control)/config/control/position_control_msf_cartographer.params.yaml" />
-        </group>
+        <rosparam command="load" file="$(arg default_params)" />
 
         <!-- Carrot-Mode reference generator node -->
-        <node pkg="uav_ros_control" type="pid_cascade_node"
-            name="$(arg control_type)" output="screen">
+        <node pkg="uav_ros_control" type="$(arg control_type)"
+            name="pid_cascade_node" output="screen">
 
             <param name="msf_callback" value="$(arg msf_callback_enable)"/>
+            <param name="local_callback" value="$(arg local_callback_enable)"/>
             <!-- Topic remapping -->
             <remap from="odometry"                  to="$(arg odom)" />
             <remap from="uav/trajectory_point"      to="$(arg traj_ref)" />

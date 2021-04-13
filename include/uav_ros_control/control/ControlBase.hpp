@@ -99,6 +99,12 @@ private:
   void odomCb(const nav_msgs::OdometryConstPtr &);
 
   /**
+   * @brief Callback for topic mavros/local_position/odom
+   * 
+   */
+  void localOdomCb(const nav_msgs::OdometryConstPtr &);
+
+  /**
    * MSF odometry callback function
    */
   void msfOdomCb(const nav_msgs::OdometryConstPtr &);

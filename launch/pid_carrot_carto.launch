@@ -4,8 +4,10 @@
     <arg name="pid_in"          default="carrot/trajectory"/>
     <arg name="odometry"            default="uav/cartographer/odometry_filtered"/>
     <arg name="msf_callback_enable"     default="false"/>
+    <arg name="local_callback_enable" default="false"/>
     <arg name="manual_takeoff"  default="true"/>
     <arg name="control_type"          default="pid_cascade_node"/> 
+    <arg name="default_params"        default="$(find uav_ros_control)/config/control/cartographer_position_control.params.yaml"/>
     
     <include file="$(find uav_ros_control)/launch/carrot_reference.launch">
         <arg name="namespace" value="$(arg namespace)"/>
@@ -19,7 +21,8 @@
         <arg name="namespace" value="$(arg namespace)"/>
         <arg name="traj_ref" value="$(arg pid_in)"/>
         <arg name="odom" value="$(arg odometry)"/>
-	    <arg name="default_params" value="cartographer_position_control.params.yaml"/>
+	    <arg name="default_params"      value="$(arg default_params)"/>
         <arg name="control_type"        value="$(arg control_type)"/>
+        <arg name="local_callback_enable" value="$(arg local_callback_enable)"/>
     </include>
 </launch>
