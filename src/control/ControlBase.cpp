@@ -77,7 +77,6 @@ void uav_controller::ControlBase::odomCb(const nav_msgs::OdometryConstPtr &messa
 
 void uav_controller::ControlBase::localOdomCb(const nav_msgs::OdometryConstPtr &message)
 {
-  ROS_INFO_THROTTLE(5.0, "Local");
   _currentPosition[0] = message->pose.pose.position.x;
   _currentPosition[1] = message->pose.pose.position.y;
   _currentPosition[2] = message->pose.pose.position.z;
