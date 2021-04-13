@@ -46,8 +46,28 @@ target_link_libraries(carrot_reference_node reference_lib)
 # PID cascade node
 add_executable(pid_cascade_node nodes/control/PositionControlNode.cpp
                                 src/control/CascadePID.cpp src/control/ControlBase.cpp)
-target_link_libraries(pid_cascade_node ${catkin_LIBRARIES} uav_pid)
+target_link_libraries(pid_cascade_node uav_pid)
 add_dependencies(pid_cascade_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+
+add_executable(
+  pid_cascade_node_yawrate nodes/control/PositionControlNode_yawrate.cpp
+                           src/control/CascadePID.cpp src/control/ControlBase.cpp)
+target_link_libraries(pid_cascade_node_yawrate uav_pid)
+add_dependencies(pid_cascade_node_yawrate ${catkin_EXPORTED_TARGETS}
+                 ${PROJECT_NAME}_gencfg)
+
+add_executable(
+  pid_cascade_node_px4 nodes/control/PositionControlNode_px4.cpp
+                       src/control/CascadePID.cpp src/control/ControlBase.cpp)
+target_link_libraries(pid_cascade_node_px4 uav_pid)
+add_dependencies(pid_cascade_node_px4 ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+
+add_executable(
+  pid_cascade_node_px4_yawrate nodes/control/PositionControlNode_px4_yawrate.cpp
+                               src/control/CascadePID.cpp src/control/ControlBase.cpp)
+target_link_libraries(pid_cascade_node_px4_yawrate uav_pid)
+add_dependencies(pid_cascade_node_px4_yawrate ${catkin_EXPORTED_TARGETS}
+                 ${PROJECT_NAME}_gencfg)
 
 # Distance control node
 add_executable(

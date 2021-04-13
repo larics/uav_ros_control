@@ -6,6 +6,7 @@
     <arg name="msf_callback_enable"     default="false"/>
     <arg name="ch_num"    default="1"/>
     <arg name="manual_takeoff"  default="true"/>
+    <arg name="control_type"          default="pid_cascade_node"/>    
 
     <include file="$(find uav_ros_control)/launch/carrot_reference.launch">
         <arg name="namespace" value="$(arg nam espace)"/>
@@ -19,6 +20,7 @@
         <arg name="namespace" value="$(arg namespace)"/>
         <arg name="traj_ref" value="$(arg pid_in)"/>
         <arg name="odom" value="$(arg odometry)"/>
+        <arg name="control_type"        value="$(arg control_type)"/>
     </include>
 
     <param name="$(arg namespace)/gps_constraints_filename" value="$(find uav_ros_control)/config/reference/ch$(arg ch_num)_gps_constraints.yaml"/>

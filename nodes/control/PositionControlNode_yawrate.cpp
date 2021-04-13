@@ -10,5 +10,5 @@ int main(int argc, char **argv)
     new uav_controller::CascadePID(nh)
   };
 
-  uav_controller::runDefault(*carrotRefObj, nh);
+  uav_controller::runDefault_yawrate(*carrotRefObj, nh);
 }

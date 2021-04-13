@@ -17,6 +17,12 @@ Both nodes are started with default configurations as follows:
 export UAV_NAMESPACE=red; roslaunch uav_ros_control pid_carrot.launch
 ```
 
+Argument **control_type** denotes the control program used:
+* pid_cascade_node - Ardupilot compatible control using roll-pitch-yaw-thrust commands
+* pid_cascade_node_yawrate - Ardupilot compatible control using roll-pitch-yawrate-thrust commands
+* pid_cascade_node_px4 - PX4 compatible control using roll-pitch-yaw-thrust commands
+* pid_cascade_node_px4_yawrate - PX4 compatible control using roll-pitch-yawrate-thrust commands
+
 ### **PositionControlNode** 
 An implementation of a cascade PID UAV control scheme  
 * Subscribed topic **odometry** 
