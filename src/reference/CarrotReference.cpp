@@ -229,13 +229,19 @@ void uav_reference::CarrotReference::updateCarrot()
     _positionHold = false;
   }
 
+  if (_positionHold) {
+    ROS_INFO_THROTTLE(10.0, "CarrotReference::update - listen to position_hold/trajectory.");
+    return;
+  }
+
   // Update carrot unless in position hold
-  if (!_positionHold && _carrotEnabled && !_carrotOnLand) {
+  if (_carrotEnabled && !_carrotOnLand) {
+    ROS_INFO_THROTTLE(10.0, "CarrotReference::update - joy update");
     updateCarrotXY();
     updateCarrotZ();
     updateCarrotYaw();
-  } else if (!_positionHold && !_carrotEnabled) {
-    // Map odometry to carrot
+  } else {
+    ROS_INFO_THROTTLE(10.0, "CarrotReference::update - reset to odom.");
     resetCarrot();
   }
 }
