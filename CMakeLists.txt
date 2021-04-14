@@ -18,6 +18,7 @@ catkin_package(
   INCLUDE_DIRS
   include
   LIBRARIES
+  uav_util
   CATKIN_DEPENDS
   uav_ros_msgs)
 
