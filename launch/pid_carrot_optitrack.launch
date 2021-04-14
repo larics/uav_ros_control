@@ -4,7 +4,7 @@
     <arg name="pid_in"                default="carrot/trajectory"/>
 
     <!-- When flying in optitrack use local_position/odom -->
-    <arg name="odometry"              default="mavros/local_position_odom/odom"/>
+    <arg name="odometry"              default="mavros/local_position/odom"/>
     <arg name="msf_callback_enable"   default="false"/>
 
     <!-- Enable local_position/odom callback flag -->
