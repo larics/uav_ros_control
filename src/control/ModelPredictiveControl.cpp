@@ -1,11 +1,15 @@
 #include <uav_ros_control/control/ModelPredictiveControl.hpp>
 #include <uav_ros_lib/param_util.hpp>
 
+
+
 uav_ros_control::ModelPredictiveControl::ModelPredictiveControl()
 {
   ROS_INFO("ModelPredictiveControl::ModelPredictiveControl()");
   // TODO:
 }
+
+
 
 void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent_nh,
   const std::string name,
@@ -15,45 +19,71 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent
   // TODO:
 
   // 0.step: Load all parameters
+  // ucitati sve parametre za solver u .yaml i .hpp file-ove
+
   double moj_param;
   Eigen::MatrixXd m_A_orig;
 
   param_util::getParamOrThrow(parent_nh, "solver_x/dt1", moj_param);
   m_A_orig = param_util::loadMatrixOrThrow(parent_nh, "A", 4, 4);
 
+
+
+
   // 1. step: Initialize m_solver private variables
   //  - m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>
   //                 ( ovdje, dolaze, argumenti, CVXWrapper, konstruktoria)
 
 
-  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(true,
-    30,
-    std::vector<double>{ 100, 50, 10 },
-    std::vector<double>{ 100, 50, 10 },
-    0.01,
-    0.2,
-    1,
-    1);
+
+  // loading parameters to constructor variables:
+  // m_solver_x:
+  param_util::getParamOrThrow(parent_nh, "solver_x/verbose", m_verbose_x);
+  param_util::getParamOrThrow(parent_nh, "solver_x/max_iters", m_max_iters_x);
+  param_util::getParamOrThrow(parent_nh, "solver_x/Q", m_Q_x);
+  param_util::getParamOrThrow(parent_nh, "solver_x/Q_last", m_Q_last_x);
+  param_util::getParamOrThrow(parent_nh, "solver_x/dt1", m_dt1_x);
+  param_util::getParamOrThrow(parent_nh, "solver_x/dt2", m_dt2_x);
+  param_util::getParamOrThrow(parent_nh, "solver_x/p1", m_p1_x);
+  param_util::getParamOrThrow(parent_nh, "solver_x/p2", m_p2_x);
+
+  // m_solver_y:
+  param_util::getParamOrThrow(parent_nh, "solver_y/verbose", m_verbose_y);
+  param_util::getParamOrThrow(parent_nh, "solver_y/max_iters", m_max_iters_y);
+  param_util::getParamOrThrow(parent_nh, "solver_y/Q", m_Q_y);
+  param_util::getParamOrThrow(parent_nh, "solver_y/Q_last", m_Q_last_y);
+  param_util::getParamOrThrow(parent_nh, "solver_y/dt1", m_dt1_y);
+  param_util::getParamOrThrow(parent_nh, "solver_y/dt2", m_dt2_y);
+  param_util::getParamOrThrow(parent_nh, "solver_y/p1", m_p1_y);
+  param_util::getParamOrThrow(parent_nh, "solver_y/p2", m_p2_y);
+  
+  // m_solver_z:
+  param_util::getParamOrThrow(parent_nh, "solver_z/verbose", m_verbose_z);
+  param_util::getParamOrThrow(parent_nh, "solver_z/max_iters", m_max_iters_z);
+  param_util::getParamOrThrow(parent_nh, "solver_z/Q", m_Q_z);
+  param_util::getParamOrThrow(parent_nh, "solver_z/Q_last", m_Q_last_z);
+  param_util::getParamOrThrow(parent_nh, "solver_z/dt1", m_dt1_z);
+  param_util::getParamOrThrow(parent_nh, "solver_z/dt2", m_dt2_z);
+  param_util::getParamOrThrow(parent_nh, "solver_z/p1", m_p1_z);
+  param_util::getParamOrThrow(parent_nh, "solver_z/p2", m_p2_z);
+
+  // creating solver objects:
+  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(m_verbose_x, m_max_iters_x, m_Q_x, m_Q_last_x, m_dt1_x, m_dt2_x, m_p1_x, m_p2_x);
+  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(m_verbose_y, m_max_iters_y, m_Q_y, m_Q_last_y, m_dt1_y, m_dt2_y, m_p1_y, m_p2_y);
+  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(m_verbose_z, m_max_iters_z, m_Q_z, m_Q_last_z, m_dt1_z, m_dt2_z, m_p1_z, m_p2_z);
 
 
-  m_solver_y = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(true,
-    30,
-    std::vector<double>{ 100, 50, 10 },
-    std::vector<double>{ 100, 50, 10 },
-    0.01,
-    0.2,
-    1,
-    1);
-
-  m_solver_z = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(true,
-    30,
-    std::vector<double>{ 100, 50, 10 },
-    std::vector<double>{ 100, 50, 10 },
-    0.01,
-    0.2,
-    1,
-    1);
+  // m_solver_z = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(true,
+  //  30,
+  //  std::vector<double>{ 100, 50, 10 },
+  //  std::vector<double>{ 100, 50, 10 },
+  //  0.01,
+  //  0.2,
+  //  1,
+  //  1);
 }
+
+
 
 
 bool uav_ros_control::ModelPredictiveControl::activate(
@@ -66,12 +96,16 @@ bool uav_ros_control::ModelPredictiveControl::activate(
 }
 
 
+
+
 void uav_ros_control::ModelPredictiveControl::deactivate()
 {
   ROS_INFO("ModelPredictiveControl::deactivate");
   // TODO:
   m_is_active = false;
 }
+
+
 
 
 const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::update(
@@ -86,9 +120,9 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
   // 1. Use all the solvers to determine the desired acceleration for the UAV
 
-  Eigen::MatrixXd initial_state;
+  Eigen::MatrixXd initial_state;  // (pozicija, brzina, akceleracija)
   Eigen::MatrixXd reference;
-  double max_speed, max_acc, max_u, max_du, dt, dt1, dt2;
+  double m_max_speed_x, max_acc, max_u, max_du, dt, dt1, dt2; // dodati u .hpp, dodati m_-----_x
   std::vector<double> Q, S;
   double u_x;
 
