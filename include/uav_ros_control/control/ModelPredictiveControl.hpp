@@ -4,6 +4,7 @@
 #include <uav_ros_control/control/controller_interface.hpp>
 #include <uav_ros_control/control/cvx_wrapper.hpp>
 #include <nav_msgs/Odometry.h>
+#include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
 namespace uav_ros_control {
 class ModelPredictiveControl : public controller_interface
 {
