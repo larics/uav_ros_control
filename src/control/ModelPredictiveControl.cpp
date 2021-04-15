@@ -1,5 +1,6 @@
 #include <uav_ros_control/control/ModelPredictiveControl.hpp>
 #include <uav_ros_lib/param_util.hpp>
+#include <nav_msgs/Odometry.h>
 
 
 
@@ -128,6 +129,11 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   
 
   
+  initial_state = *uav_state;
+  reference = *last_position_cmd;
+  
+  odom_pos_x = uav_state.pose.pose.position.x;
+
 
 
 

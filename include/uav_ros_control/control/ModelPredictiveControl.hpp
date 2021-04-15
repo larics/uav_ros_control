@@ -3,6 +3,7 @@
 
 #include <uav_ros_control/control/controller_interface.hpp>
 #include <uav_ros_control/control/cvx_wrapper.hpp>
+#include <nav_msgs/Odometry.h>
 namespace uav_ros_control {
 class ModelPredictiveControl : public controller_interface
 {
@@ -52,6 +53,19 @@ private:
   double m_max_speed_y, m_max_acc_y, m_max_u_y, m_max_du_y, m_u_y;
   Eigen::MatrixXd m_initial_state_z, m_reference_z;
   double m_max_speed_z, m_max_acc_z, m_max_u_z, m_max_du_z, m_u_z;
+
+
+  // messages from Odometry and Trajectory
+  nav_msgs::Odometry initial_state;
+  trajectory_msgs::MultiDOFJointTrajectoryPoint reference;
+
+  double odom_pos_x, odom_pos_y, odom_pos_z;
+  double odom_spd_x, odom_spd_y, odom_spd_z;
+  double odom_acc_x, odom_acc_y, odom_acc_z;
+  double ref_pos_x, ref_pos_y, ref_pos_z;
+  double ref_spd_x, ref_spd_y, ref_spd_z;
+  double ref_acc_x, ref_acc_y, ref_acc_z;
+
 
 
 
