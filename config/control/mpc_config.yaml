@@ -6,6 +6,7 @@ A: [1, 0.01, 0.00005, 0,
  0, 0, 1, 0.01,
  0, 0, 0, 1]
 
+ 
 solver_x:
   verbose: true
   max_iters: 30
@@ -15,6 +16,11 @@ solver_x:
   dt2: 0.2
   p1: 1
   p2: 2
+  max_speed: 1
+  max_acc: 1
+  max_u: 1
+  max_du: 1
+
 
 solver_y:
   verbose: true
@@ -25,6 +31,10 @@ solver_y:
   dt2: 0.2
   p1: 1
   p2: 2
+  max_speed: 1
+  max_acc: 1
+  max_u: 1
+  max_du: 1
 
 solver_z:
   verbose: true
@@ -35,5 +45,9 @@ solver_z:
   dt2: 0.2
   p1: 1
   p2: 2
+  max_speed: 1
+  max_acc: 1
+  max_u: 1
+  max_du: 1
 
   
