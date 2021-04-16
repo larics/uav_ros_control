@@ -189,9 +189,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
 
 
-
-
-
+  // neke linije bi mozda mogle u initialize buduci da se nemoraju izvrsavati stalno?
 
   
   m_solver_x->setInitialState(m_initial_state_x);
