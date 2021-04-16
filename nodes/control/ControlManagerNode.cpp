@@ -62,12 +62,44 @@ int main(int argc, char **argv)
     nh.advertise<mavros_msgs::AttitudeTarget>("mavros/setpoint_raw/attitude", 1);
   auto odom_sub = nh.subscribe<nav_msgs::Odometry>(
     "odometry", 1, [&](const nav_msgs::OdometryConstPtr &msg) {
-      if (is_controller_active) {
+      if (!is_controller_active) {
+        ROS_WARN_THROTTLE(
+          5.0, "[ControlManager] Odometry recieved but controller inactive.");
+        return;
+      }
+
+      if (traj_msg_ptr) {
         const auto att_cmd = controller->update(msg, traj_msg_ptr);
         att_target_pub.publish(att_cmd);
+        return;
       }
+
+      // If trajectory point is not recieved set it to current odometry
+      trajectory_msgs::MultiDOFJointTrajectoryPoint odom_traj_point;
+      odom_traj_point.transforms =
+        std::vector<geometry_msgs::Transform>{ geometry_msgs::Transform{} };
+      odom_traj_point.velocities =
+        std::vector<geometry_msgs::Twist>{ geometry_msgs::Twist{} };
+      odom_traj_point.accelerations =
+        std::vector<geometry_msgs::Twist>{ geometry_msgs::Twist{} };
+
+      odom_traj_point.transforms.front().translation.x = msg->pose.pose.position.x;
+      odom_traj_point.transforms.front().translation.y = msg->pose.pose.position.y;
+      odom_traj_point.transforms.front().translation.z = msg->pose.pose.position.z;
+      odom_traj_point.transforms.front().rotation = msg->pose.pose.orientation;
+      odom_traj_point.velocities.front() = msg->twist.twist;
+
+      ROS_WARN(
+        "[ControlManager] Controller is active but trajecotry point is not recieved, "
+        "this shouldn't happen! Setting trajectory point same as odometry.");
+
+      auto odom_traj_ptr =
+        boost::make_shared<const trajectory_msgs::MultiDOFJointTrajectoryPoint>(
+          odom_traj_point);
+      const auto att_cmd = controller->update(msg, odom_traj_ptr);
+      att_target_pub.publish(att_cmd);
     });
-  
+
   ros::spin();
   return 0;
 }
