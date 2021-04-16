@@ -9,6 +9,13 @@ uav_ros_control::ModelPredictiveControl::ModelPredictiveControl()
 {
   ROS_INFO("ModelPredictiveControl::ModelPredictiveControl()");
   // TODO:
+
+  m_initial_state_x = Eigen::MatrixXd::Zero(3,1);
+  m_initial_state_y = Eigen::MatrixXd::Zero(3,1);
+  m_initial_state_z = Eigen::MatrixXd::Zero(3,1);
+  m_reference_x = Eigen::MatrixXd::Zero(3,1);
+  m_reference_y = Eigen::MatrixXd::Zero(3,1);
+  m_reference_z = Eigen::MatrixXd::Zero(3,1);
 }
 
 
