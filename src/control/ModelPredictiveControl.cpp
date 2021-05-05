@@ -2,6 +2,7 @@
 #include <uav_ros_lib/param_util.hpp>
 #include <nav_msgs/Odometry.h>
 #include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
+#include <Eigen/Dense>
 
 
 
@@ -161,6 +162,8 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   ref_acc_y = last_position_cmd->accelerations[0].linear.y;
   ref_acc_z = last_position_cmd->accelerations[0].linear.z;
 
+  ref_orientation_Q = last_position_cmd->transforms[0].rotation;      // getting reference orientation (Quaternion)
+
 
 
 
@@ -224,16 +227,55 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
 
 
-
-
-
-
+  
 
   // 2. Use the desired acceleration to calculate the orientation
+
+  eig_ref_orientation_Q.x() = ref_orientation_Q.x;          // getting reference orientation (transform to Eigen::Quaternionf)
+  eig_ref_orientation_Q.y() = ref_orientation_Q.y; 
+  eig_ref_orientation_Q.z() = ref_orientation_Q.z; 
+  eig_ref_orientation_Q.w() = ref_orientation_Q.w;
+
+  euler = eig_ref_orientation_Q.toRotationMatrix().eulerAngles(0, 1, 2);      // getting reference heading (yaw)
+  roll = euler[0];
+  pitch = euler[1];
+  yaw = euler[2];
+
+  Xc(0) = cos(yaw);       // heading constraints
+  Xc(1) = sin(yaw);
+  Xc(2) = 0;
+  Yc(0) = -sin(yaw);
+  Yc(1) = cos(yaw);
+  Yc(2) = 0;
+
+  a_des(0) = m_u_x;       // filling desired acceleration from solver
+  a_des(1) = m_u_y;
+  a_des(2) = m_u_z;
+
+  Zb = a_des/a_des.norm();         // calculating desired orientation R_des
+  Xb = (Yc.cross(Zb))/(Yc.cross(Zb).norm());
+  Yb = Zb.cross(Xb);
+
+  R_des << Xb, Yb, Zb;        // filling desired orientation
+
+  eig_des_orientation_Q = R_des;      // matrix to quaternion conversion
+
+
+
+
+
+
+
+
   // 3. Use the desired acceleration to calculate thrust
 
-  mavros_msgs::AttitudeTarget attitude_target;
-  // 3. step - Fill out the atttitude_target object - VERY IMPORTANT!
+  des_orientation_Q.x = eig_des_orientation_Q.x();      // filling in geometry_msgs/Quaternion
+  des_orientation_Q.y = eig_des_orientation_Q.y();
+  des_orientation_Q.z = eig_des_orientation_Q.z();
+  des_orientation_Q.w = eig_des_orientation_Q.w();
+
+  attitude_target.orientation = des_orientation_Q;
+
   return attitude_target;
 }
 

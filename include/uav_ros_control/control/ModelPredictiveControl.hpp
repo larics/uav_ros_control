@@ -5,6 +5,7 @@
 #include <uav_ros_control/control/cvx_wrapper.hpp>
 #include <nav_msgs/Odometry.h>
 #include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
+#include <Eigen/Dense>
 namespace uav_ros_control {
 class ModelPredictiveControl : public controller_interface
 {
@@ -68,6 +69,18 @@ private:
   double ref_acc_x, ref_acc_y, ref_acc_z;
 
 
+  //control loop variables
+  mavros_msgs::AttitudeTarget attitude_target;
+
+  geometry_msgs::Quaternion ref_orientation_Q, des_orientation_Q;
+  Eigen::Quaternionf eig_ref_orientation_Q, eig_des_orientation_Q;
+  Eigen::Vector3f euler;
+  double roll, pitch, yaw;
+
+  Eigen::Vector3f Xc, Yc;
+  Eigen::Vector3f a_des;
+  Eigen::Vector3f Xb, Yb, Zb;
+  Eigen::Matrix3f R_des;
 
 
 
