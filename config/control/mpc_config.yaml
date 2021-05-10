@@ -50,4 +50,13 @@ solver_z:
   max_u: 1
   max_du: 1
 
+feed_forward_acceleration_flag: true
+
+motor_params:
+  A: 1.0
+  B: 1.0
+  n_motors: 4
+
+UAV_mass: 9.0
+
   

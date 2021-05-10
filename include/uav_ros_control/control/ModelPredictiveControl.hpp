@@ -45,8 +45,11 @@ private:
   // constructor variables
   bool m_verbose_x, m_verbose_y, m_verbose_z;
   int m_max_iters_x, m_max_iters_y, m_max_iters_z;
-  std::vector<double> m_Q_x, m_Q_y, m_Q_z, m_Q_last_x, m_Q_last_y, m_Q_last_z;
-  double m_dt1_x, m_dt2_x, m_p1_x, m_p2_x, m_dt1_y, m_dt2_y, m_p1_y, m_p2_y, m_dt1_z, m_dt2_z, m_p1_z, m_p2_z;
+  std::vector<double> m_Q_x, m_Q_y, m_Q_z;
+  std::vector<double> m_Q_last_x, m_Q_last_y, m_Q_last_z;
+  double m_dt1_x, m_dt2_x, m_p1_x, m_p2_x;
+  double m_dt1_y, m_dt2_y, m_p1_y, m_p2_y;
+  double m_dt1_z, m_dt2_z, m_p1_z, m_p2_z;
 
   // solver variables (states and constraints)
   Eigen::MatrixXd m_initial_state_x, m_reference_x;
@@ -69,9 +72,10 @@ private:
   double ref_acc_x, ref_acc_y, ref_acc_z;
 
 
-  //control loop variables
+  // control loop variables
   mavros_msgs::AttitudeTarget attitude_target;
 
+  // orientation
   geometry_msgs::Quaternion ref_orientation_Q, des_orientation_Q;
   Eigen::Quaternionf eig_ref_orientation_Q, eig_des_orientation_Q;
   Eigen::Vector3f euler;
@@ -81,6 +85,19 @@ private:
   Eigen::Vector3f a_des;
   Eigen::Vector3f Xb, Yb, Zb;
   Eigen::Matrix3f R_des;
+
+  // thrust
+  bool feed_fwd_acc_flag;
+  const double g = 9.81;
+  Eigen::Vector3f Ra, f;
+  double A, B, UAV_mass;
+  int n_motors;
+  double thrust_force, thrust;
+  geometry_msgs::Quaternion R_Q;
+  Eigen::Quaternionf eig_R_Q;
+  Eigen::Matrix3f R;
+
+
 
 
 

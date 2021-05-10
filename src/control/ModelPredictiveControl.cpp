@@ -28,23 +28,18 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent
   ROS_INFO("ModelPredictiveControl::initialize()");
   // TODO:
 
-  // 0.step: Load all parameters
-  // ucitati sve parametre za solver u .yaml i .hpp file-ove
+  // 0.step: Load all parameters for the solver into .yaml and .hpp files
 
-  double moj_param;
-  Eigen::MatrixXd m_A_orig;
+  // double moj_param;
+  // Eigen::MatrixXd m_A_orig;
 
-  param_util::getParamOrThrow(parent_nh, "solver_x/dt1", moj_param);
-  m_A_orig = param_util::loadMatrixOrThrow(parent_nh, "A", 4, 4);
+  // param_util::getParamOrThrow(parent_nh, "solver_x/dt1", moj_param);
+  // m_A_orig = param_util::loadMatrixOrThrow(parent_nh, "A", 4, 4);
 
 
 
 
   // 1. step: Initialize m_solver private variables
-  //  - m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>
-  //                 ( ovdje, dolaze, argumenti, CVXWrapper, konstruktoria)
-
-
 
   // loading parameters to constructor variables:
   // m_solver_x:
@@ -95,6 +90,13 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle &parent
   param_util::getParamOrThrow(parent_nh, "solver_z/max_acc", m_max_acc_z);
   param_util::getParamOrThrow(parent_nh, "solver_z/max_du", m_max_du_z);
   param_util::getParamOrThrow(parent_nh, "solver_z/max_u", m_max_u_z);
+
+  // loading other parameters
+  param_util::getParamOrThrow(parent_nh, "feed_forward_acceleration_flag", feed_fwd_acc_flag);
+  param_util::getParamOrThrow(parent_nh, "motor_params/A", A);
+  param_util::getParamOrThrow(parent_nh, "motor_params/B", B);
+  param_util::getParamOrThrow(parent_nh, "motor_params/n_motors", n_motors);
+  param_util::getParamOrThrow(parent_nh, "UAV_mass", UAV_mass);
 
 }
 
@@ -151,6 +153,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   odom_acc_x = 0;
   odom_acc_y = 0;
   odom_acc_z = 0;
+  R_Q = uav_state->pose.pose.orientation;             // getting actual uav orientation
 
   ref_pos_x = last_position_cmd->transforms[0].translation.x;
   ref_pos_y = last_position_cmd->transforms[0].translation.y;
@@ -191,10 +194,11 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
 
 
-
-  // neke linije bi mozda mogle u initialize buduci da se nemoraju izvrsavati stalno?
-
+  // ----------------------------------//
+  // using the solver for optimization //
+  // ----------------------------------//
   
+  m_solver_x->lock();
   m_solver_x->setInitialState(m_initial_state_x);
   m_solver_x->loadReference(m_reference_x);
   m_solver_x->setLimits(m_max_speed_x, m_max_acc_x, m_max_u_x, m_max_du_x, m_dt1_x, m_dt2_x);
@@ -203,8 +207,10 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_x->setS(m_Q_last_x);
   m_solver_x->setParams();
   m_solver_x->solveCvx();
-  m_u_x = m_solver_x->getFirstControlInput();      // ovo je akceleracija u x-smjeru <double> dobivena iz solvera
+  m_u_x = m_solver_x->getFirstControlInput();      // acceleration in x-direction (double)
+  m_solver_x->unlock();
 
+  m_solver_y->lock();
   m_solver_y->setInitialState(m_initial_state_y);
   m_solver_y->loadReference(m_reference_y);
   m_solver_y->setLimits(m_max_speed_y, m_max_acc_y, m_max_u_y, m_max_du_y, m_dt1_y, m_dt2_y);
@@ -213,8 +219,10 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_y->setS(m_Q_last_y);
   m_solver_y->setParams();
   m_solver_y->solveCvx();
-  m_u_y = m_solver_y->getFirstControlInput();      // ovo je akceleracija u y-smjeru <double> dobivena iz solvera
+  m_u_y = m_solver_y->getFirstControlInput();      // acceleration in y-direction (double)
+  m_solver_y->unlock();
 
+  m_solver_z->lock();
   m_solver_z->setInitialState(m_initial_state_z);
   m_solver_z->loadReference(m_reference_z);
   m_solver_z->setLimits(m_max_speed_z, m_max_acc_z, m_max_u_z, m_max_du_z, m_dt1_z, m_dt2_z);
@@ -223,7 +231,8 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_z->setS(m_Q_last_z);
   m_solver_z->setParams();
   m_solver_z->solveCvx();
-  m_u_z = m_solver_z->getFirstControlInput();      // ovo je akceleracija u z-smjeru <double> dobivena iz solvera
+  m_u_z = m_solver_z->getFirstControlInput();      // acceleration in z-direction (double)
+  m_solver_z->unlock();
 
 
 
@@ -231,8 +240,8 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
   // 2. Use the desired acceleration to calculate the orientation
 
-  eig_ref_orientation_Q.x() = ref_orientation_Q.x;          // getting reference orientation (transform to Eigen::Quaternionf)
-  eig_ref_orientation_Q.y() = ref_orientation_Q.y; 
+  eig_ref_orientation_Q.x() = ref_orientation_Q.x;          // getting reference orientation 
+  eig_ref_orientation_Q.y() = ref_orientation_Q.y;          // (transform to Eigen::Quaternionf)
   eig_ref_orientation_Q.z() = ref_orientation_Q.z; 
   eig_ref_orientation_Q.w() = ref_orientation_Q.w;
 
@@ -248,7 +257,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   Yc(1) = cos(yaw);
   Yc(2) = 0;
 
-  a_des(0) = m_u_x;       // filling desired acceleration from solver
+  a_des(0) = m_u_x;       // filling in desired acceleration from the solver
   a_des(1) = m_u_y;
   a_des(2) = m_u_z;
 
@@ -269,12 +278,39 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
   // 3. Use the desired acceleration to calculate thrust
 
+  if (feed_fwd_acc_flag) {
+    Ra << ref_acc_x + m_u_x, ref_acc_y + m_u_y, ref_acc_z + m_u_z;
+  } else {
+    Ra << m_u_x, m_u_y, m_u_z;
+  }
+
+  eig_R_Q.x() = R_Q.x;
+  eig_R_Q.y() = R_Q.y;
+  eig_R_Q.z() = R_Q.z;
+  eig_R_Q.w() = R_Q.w;
+  R = eig_R_Q.toRotationMatrix();
+
+  f = UAV_mass * (Eigen::Vector3f(0, 0, g) + Ra);
+  thrust_force = f.dot(R.col(2));
+  thrust = sqrt(thrust_force / n_motors) * A + B;
+
+
+
+
+
+
+
+  // --------------------------------- //
+  // filling in the AttitudeTarget msg //
+  // --------------------------------- //
+
   des_orientation_Q.x = eig_des_orientation_Q.x();      // filling in geometry_msgs/Quaternion
   des_orientation_Q.y = eig_des_orientation_Q.y();
   des_orientation_Q.z = eig_des_orientation_Q.z();
   des_orientation_Q.w = eig_des_orientation_Q.w();
-
   attitude_target.orientation = des_orientation_Q;
+
+  attitude_target.thrust = thrust;
 
   return attitude_target;
 }
