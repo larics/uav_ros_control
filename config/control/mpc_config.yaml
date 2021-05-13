@@ -1,12 +1,15 @@
 placeholder_a: 1
 placeholder_b: 2
 moj_param: 3
-A: [1, 0.01, 0.00005, 0,
- 0, 1, 0.01, 0.00005,
- 0, 0, 1, 0.01,
- 0, 0, 0, 1]
+A: [
+  1, 0.01, 0.00005, 0,
+  0, 1,    0.01,    0.00005,
+  0, 0,    1,       0.01,
+  0, 0,    0,       1
+]
 
- 
+horizon_len: 26
+
 solver_x:
   verbose: true
   max_iters: 30
@@ -20,7 +23,6 @@ solver_x:
   max_acc: 1
   max_u: 1
   max_du: 1
-
 
 solver_y:
   verbose: true
@@ -58,5 +60,3 @@ motor_params:
   n_motors: 4
 
 UAV_mass: 9.0
-
-  
