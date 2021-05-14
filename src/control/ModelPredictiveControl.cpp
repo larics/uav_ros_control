@@ -13,9 +13,6 @@ uav_ros_control::ModelPredictiveControl::ModelPredictiveControl()
   m_initial_state_x = Eigen::MatrixXd::Zero(3, 1);
   m_initial_state_y = Eigen::MatrixXd::Zero(3, 1);
   m_initial_state_z = Eigen::MatrixXd::Zero(3, 1);
-  m_reference_x     = Eigen::MatrixXd::Zero(3, 1);
-  m_reference_y     = Eigen::MatrixXd::Zero(3, 1);
-  m_reference_z     = Eigen::MatrixXd::Zero(3, 1);
 }
 
 
@@ -26,6 +23,7 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   ROS_INFO("ModelPredictiveControl::initialize()");
 
   // loading parameters to constructor variables
+  // m_solver_x:
   param_util::getParamOrThrow(parent_nh, "solver_x/verbose", m_verbose_x);
   param_util::getParamOrThrow(parent_nh, "solver_x/max_iters", m_max_iters_x);
   param_util::getParamOrThrow(parent_nh, "solver_x/Q", m_Q_x);
@@ -84,6 +82,12 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   param_util::getParamOrThrow(parent_nh, "motor_params/B", B);
   param_util::getParamOrThrow(parent_nh, "motor_params/n_motors", n_motors);
   param_util::getParamOrThrow(parent_nh, "UAV_mass", UAV_mass);
+  param_util::getParamOrThrow(parent_nh, "horizon_len", m_horizon_len);
+
+  // initializing references for solver
+  m_reference_x     = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
+  m_reference_y     = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
+  m_reference_z     = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
 }
 
 
@@ -153,15 +157,19 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_initial_state_z(1, 0) = odom_spd_z;
   m_initial_state_z(2, 0) = odom_acc_z;
 
-  m_reference_x(0, 0) = ref_pos_x;
-  m_reference_x(1, 0) = ref_spd_x;
-  m_reference_x(2, 0) = ref_acc_x;
-  m_reference_y(0, 0) = ref_pos_y;
-  m_reference_y(1, 0) = ref_spd_y;
-  m_reference_y(2, 0) = ref_acc_y;
-  m_reference_z(0, 0) = ref_pos_z;
-  m_reference_z(1, 0) = ref_spd_z;
-  m_reference_z(2, 0) = ref_acc_z;
+  for (int i = 0; i < m_horizon_len; i++){
+    m_reference_x(3 * i + 0, 0) = ref_pos_x;
+    m_reference_x(3 * i + 1, 0) = ref_spd_x;
+    m_reference_x(3 * i + 2, 0) = ref_acc_x;
+
+    m_reference_y(3 * i + 0, 0) = ref_pos_y;
+    m_reference_y(3 * i + 1, 0) = ref_spd_y;
+    m_reference_y(3 * i + 2, 0) = ref_acc_y;
+
+    m_reference_z(3 * i + 0, 0) = ref_pos_z;
+    m_reference_z(3 * i + 1, 0) = ref_spd_z;
+    m_reference_z(3 * i + 2, 0) = ref_acc_z;
+  }
 
 
   // ----------------------------------//

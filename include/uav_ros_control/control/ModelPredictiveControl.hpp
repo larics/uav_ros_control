@@ -39,6 +39,7 @@ private:
   std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_z;
 
   bool m_is_active = false;
+  int m_horizon_len;
 
   // constructor variables
   bool                m_verbose_x, m_verbose_y, m_verbose_z;
