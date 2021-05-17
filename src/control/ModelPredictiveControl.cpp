@@ -56,9 +56,9 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   // creating solver objects:
   m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
     m_verbose_x, m_max_iters_x, m_Q_x, m_Q_last_x, m_dt1_x, m_dt2_x, m_p1_x, m_p2_x);
-  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
+  m_solver_y = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
     m_verbose_y, m_max_iters_y, m_Q_y, m_Q_last_y, m_dt1_y, m_dt2_y, m_p1_y, m_p2_y);
-  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
+  m_solver_z = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
     m_verbose_z, m_max_iters_z, m_Q_z, m_Q_last_z, m_dt1_z, m_dt2_z, m_p1_z, m_p2_z);
 
   // loading constraints
