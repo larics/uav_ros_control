@@ -96,7 +96,8 @@ private:
 
   // ROS
   ros::Publisher m_acc_desired_pub;
-
+  ros::Publisher m_thrust_force_pub;
+  ros::Publisher m_scaled_thrust_pub;
 };
 }// namespace uav_ros_control
 

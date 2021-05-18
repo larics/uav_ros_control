@@ -3,6 +3,7 @@
 #include <nav_msgs/Odometry.h>
 #include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
 #include <geometry_msgs/Vector3.h>
+#include <std_msgs/Float64.h>
 #include <Eigen/Dense>
 
 
@@ -24,6 +25,8 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   ROS_INFO("ModelPredictiveControl::initialize()");
 
   m_acc_desired_pub = parent_nh.advertise<geometry_msgs::Vector3>("debug/desired_acc", 1);
+  m_thrust_force_pub  = parent_nh.advertise<std_msgs::Float64>("debug/thrust_force", 1);
+  m_scaled_thrust_pub = parent_nh.advertise<std_msgs::Float64>("debug/scaled_thrust", 1);
 
   // loading parameters to constructor variables
   // m_solver_x:
@@ -220,9 +223,11 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
   // Publish desired acceleration
   geometry_msgs::Vector3 acc_msg;
-  // fill the message
+  acc_msg.x = m_u_x;
+  acc_msg.y = m_u_y;
+  acc_msg.z = m_u_z;
   m_acc_desired_pub.publish(acc_msg);
-  
+
   // 2. Use the desired acceleration to calculate the orientation
 
   eig_ref_orientation_Q.x() = ref_orientation_Q.x;// getting reference orientation
@@ -269,10 +274,19 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   eig_R_Q.z()  = R_Q.z;
   eig_R_Q.w()  = R_Q.w;
   R            = eig_R_Q.toRotationMatrix();
-  f            = UAV_mass * (Eigen::Vector3f(0, 0, g) + Ra);
+  f            = UAV_mass * Ra;
   thrust_force = f.dot(R.col(2));
   thrust       = sqrt(thrust_force / n_motors) * A + B;
 
+  // Publish thrust force
+  std_msgs::Float64 thrust_force_msg;
+  thrust_force_msg.data = thrust_force;
+  m_thrust_force_pub.publish(thrust_force_msg);
+
+  // Publish scaled thrust
+  std_msgs::Float64 scaled_thrust_msg;
+  scaled_thrust_msg.data = thrust;
+  m_scaled_thrust_pub.publish(scaled_thrust_msg);
 
   // --------------------------------- //
   // filling in the AttitudeTarget msg //
@@ -284,14 +298,13 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   des_orientation_Q.z = eig_des_orientation_Q.z();
   des_orientation_Q.w = eig_des_orientation_Q.w();
 
-  constexpr auto type_mask = mavros_msgs::AttitudeTarget::IGNORE_PITCH_RATE
-                             + mavros_msgs::AttitudeTarget::IGNORE_ROLL_RATE
-                             + mavros_msgs::AttitudeTarget::IGNORE_YAW_RATE;
+  static constexpr auto type_mask = mavros_msgs::AttitudeTarget::IGNORE_PITCH_RATE
+                                    + mavros_msgs::AttitudeTarget::IGNORE_ROLL_RATE
+                                    + mavros_msgs::AttitudeTarget::IGNORE_YAW_RATE;
   attitude_target.header.stamp = ros::Time::now();
   attitude_target.type_mask    = type_mask;
   attitude_target.orientation  = des_orientation_Q;
-
-  attitude_target.thrust = thrust;
+  attitude_target.thrust       = 0.5 + thrust;
 
   return attitude_target;
 }
