@@ -2,6 +2,7 @@
 #include <uav_ros_lib/param_util.hpp>
 #include <nav_msgs/Odometry.h>
 #include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
+#include <geometry_msgs/Vector3.h>
 #include <Eigen/Dense>
 
 
@@ -21,6 +22,8 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
                                                          const double      uav_mass)
 {
   ROS_INFO("ModelPredictiveControl::initialize()");
+
+  m_acc_desired_pub = parent_nh.advertise<geometry_msgs::Vector3>("debug/desired_acc", 1);
 
   // loading parameters to constructor variables
   // m_solver_x:
@@ -215,7 +218,11 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_u_z = m_solver_z->getFirstControlInput();// acceleration in z-direction (double)
   m_solver_z->unlock();
 
-
+  // Publish desired acceleration
+  geometry_msgs::Vector3 acc_msg;
+  // fill the message
+  m_acc_desired_pub.publish(acc_msg);
+  
   // 2. Use the desired acceleration to calculate the orientation
 
   eig_ref_orientation_Q.x() = ref_orientation_Q.x;// getting reference orientation

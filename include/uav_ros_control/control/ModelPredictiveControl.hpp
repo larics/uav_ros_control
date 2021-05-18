@@ -93,6 +93,10 @@ private:
   geometry_msgs::Quaternion R_Q;
   Eigen::Quaternionf        eig_R_Q;
   Eigen::Matrix3f           R;
+
+  // ROS
+  ros::Publisher m_acc_desired_pub;
+
 };
 }// namespace uav_ros_control
 
