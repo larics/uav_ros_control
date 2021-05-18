@@ -85,9 +85,9 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   param_util::getParamOrThrow(parent_nh, "horizon_len", m_horizon_len);
 
   // initializing references for solver
-  m_reference_x     = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
-  m_reference_y     = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
-  m_reference_z     = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
+  m_reference_x = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
+  m_reference_y = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
+  m_reference_z = Eigen::MatrixXd::Zero(3 * m_horizon_len, 1);
 }
 
 
@@ -157,7 +157,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_initial_state_z(1, 0) = odom_spd_z;
   m_initial_state_z(2, 0) = odom_acc_z;
 
-  for (int i = 0; i < m_horizon_len; i++){
+  for (int i = 0; i < m_horizon_len; i++) {
     m_reference_x(3 * i + 0, 0) = ref_pos_x;
     m_reference_x(3 * i + 1, 0) = ref_spd_x;
     m_reference_x(3 * i + 2, 0) = ref_acc_x;
@@ -271,11 +271,18 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   // filling in the AttitudeTarget msg //
   // --------------------------------- //
 
+
   des_orientation_Q.x = eig_des_orientation_Q.x();// filling in geometry_msgs/Quaternion
   des_orientation_Q.y = eig_des_orientation_Q.y();
   des_orientation_Q.z = eig_des_orientation_Q.z();
   des_orientation_Q.w = eig_des_orientation_Q.w();
-  attitude_target.orientation = des_orientation_Q;
+
+  constexpr auto type_mask = mavros_msgs::AttitudeTarget::IGNORE_PITCH_RATE
+                             + mavros_msgs::AttitudeTarget::IGNORE_ROLL_RATE
+                             + mavros_msgs::AttitudeTarget::IGNORE_YAW_RATE;
+  attitude_target.header.stamp = ros::Time::now();
+  attitude_target.type_mask    = type_mask;
+  attitude_target.orientation  = des_orientation_Q;
 
   attitude_target.thrust = thrust;
 
