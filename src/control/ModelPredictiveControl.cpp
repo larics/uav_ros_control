@@ -132,7 +132,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   odom_pos_z = uav_state->pose.pose.position.z;
   odom_spd_x = uav_state->twist.twist.linear.x;
   odom_spd_y = uav_state->twist.twist.linear.y;
-  odom_spd_z = uav_state->twist.twist.linear.z;
+  odom_spd_z = -uav_state->twist.twist.linear.z;
   odom_acc_x = 0;
   odom_acc_y = 0;
   odom_acc_z = 0;
@@ -151,6 +151,14 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   ref_orientation_Q = last_position_cmd->transforms[0]
                         .rotation;// getting reference orientation (Quaternion)
 
+  ROS_INFO_THROTTLE(5.0,
+                    "Current: [%.2f, %.2f, %.2f] Referent: [%.2f, %.2f, %.2f]",
+                    odom_pos_x,
+                    odom_pos_y,
+                    odom_pos_z,
+                    ref_pos_x,
+                    ref_pos_y,
+                    ref_pos_z);
 
   // filling in InitialState and Reference
   m_initial_state_x(0, 0) = odom_pos_x;
@@ -274,9 +282,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   eig_R_Q.z()  = R_Q.z;
   eig_R_Q.w()  = R_Q.w;
   R            = eig_R_Q.toRotationMatrix();
-  f            = UAV_mass * Ra;
-  thrust_force = f.dot(R.col(2));
-  thrust       = sqrt(thrust_force / n_motors) * A + B;
+  thrust_force = Ra.dot(R.col(2));
 
   // Publish thrust force
   std_msgs::Float64 thrust_force_msg;
@@ -304,7 +310,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   attitude_target.header.stamp = ros::Time::now();
   attitude_target.type_mask    = type_mask;
   attitude_target.orientation  = des_orientation_Q;
-  attitude_target.thrust       = 0.5 + thrust;
+  attitude_target.thrust       = 0.5 + thrust_force;
 
   return attitude_target;
 }
