@@ -245,31 +245,27 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
 
   euler = eig_ref_orientation_Q.toRotationMatrix().eulerAngles(
     0, 1, 2);// getting reference heading (yaw)
-  roll  = euler[0];
-  pitch = euler[1];
-  yaw   = euler[2];
+  yaw = euler[2];
 
   Xc(0) = cos(yaw);// heading constraints
   Xc(1) = sin(yaw);
   Xc(2) = 0;
-  Yc(0) = -sin(yaw);
-  Yc(1) = cos(yaw);
-  Yc(2) = 0;
 
   a_des(0) = m_u_x;// filling in desired acceleration from the solver
   a_des(1) = m_u_y;
   a_des(2) = m_u_z;
 
-  Zb = a_des / a_des.norm();// calculating desired orientation R_des
-  Xb = (Yc.cross(Zb)) / (Yc.cross(Zb).norm());
-  Yb = Zb.cross(Xb);
+  Eigen::Vector3f force            = UAV_mass * (Eigen::Vector3f(0, 0, 9.81) + Ra);
+  Eigen::Vector3f force_normalized = force.normalized();
 
-  R_des << Xb, Yb, Zb;// filling desired orientation
+  // TODO: Saturate the force vector
+
+  R_des.col(2) = force_normalized;
+  R_des.col(1) = R_des.col(2).cross(Xc);
+  R_des.col(1).normalize();
+  R_des.col(0) = R_des.col(1).cross(R_des.col(2));
 
   eig_des_orientation_Q = R_des;// matrix to quaternion conversion
-
-
-  // 3. Use the desired acceleration to calculate thrust
 
   if (feed_fwd_acc_flag) {
     Ra << ref_acc_x + m_u_x, ref_acc_y + m_u_y, ref_acc_z + m_u_z;
