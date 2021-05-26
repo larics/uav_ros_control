@@ -229,6 +229,10 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_u_z = m_solver_z->getFirstControlInput();// acceleration in z-direction (double)
   m_solver_z->unlock();
 
+
+
+
+
   // Publish desired acceleration
   geometry_msgs::Vector3 acc_msg;
   acc_msg.x = m_u_x;

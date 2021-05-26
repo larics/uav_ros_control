@@ -17,7 +17,7 @@ solver_x:
   Q_last: [1000, 300, 300]
   dt1: 0.01
   dt2: 0.05
-  p1: 0
+  p1: 1
   p2: 1
   max_speed: 2
   max_acc: 2
@@ -31,7 +31,7 @@ solver_y:
   Q_last: [1000, 300, 300]
   dt1: 0.01
   dt2: 0.05
-  p1: 0
+  p1: 1
   p2: 1
   max_speed: 2
   max_acc: 2
@@ -41,12 +41,12 @@ solver_y:
 solver_z:
   verbose: false
   max_iters: 30
-  Q: [100, 10, 10]
-  Q_last: [100, 10, 10]
+  Q: [500, 100, 100]
+  Q_last: [1000, 300, 300]
   dt1: 0.01
   dt2: 0.05
-  p1: 0.5
-  p2: 0.5
+  p1: 1
+  p2: 1
   max_speed: 2
   max_acc: 2
   max_u: 50
