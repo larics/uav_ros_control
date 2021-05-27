@@ -42,21 +42,24 @@ private:
   int  m_horizon_len;
 
   // constructor variables
-  bool                m_verbose_x, m_verbose_y, m_verbose_z;
-  int                 m_max_iters_x, m_max_iters_y, m_max_iters_z;
-  std::vector<double> m_Q_x, m_Q_y, m_Q_z;
-  std::vector<double> m_Q_last_x, m_Q_last_y, m_Q_last_z;
-  double              m_dt1_x, m_dt2_x, m_p1_x, m_p2_x;
-  double              m_dt1_y, m_dt2_y, m_p1_y, m_p2_y;
+  bool                m_verbose_xy, m_verbose_z;
+  int                 m_max_iters_xy, m_max_iters_z;
+  std::vector<double> m_Q_xy, m_Q_z;
+  std::vector<double> m_Q_last_xy, m_Q_last_z;
+  double              m_dt1_xy, m_dt2_xy, m_p1_xy, m_p2_xy;
   double              m_dt1_z, m_dt2_z, m_p1_z, m_p2_z;
 
   // solver variables (states and constraints)
   Eigen::MatrixXd m_initial_state_x, m_reference_x;
-  double          m_max_speed_x, m_max_acc_x, m_max_u_x, m_max_du_x, m_u_x;
   Eigen::MatrixXd m_initial_state_y, m_reference_y;
-  double          m_max_speed_y, m_max_acc_y, m_max_u_y, m_max_du_y, m_u_y;
   Eigen::MatrixXd m_initial_state_z, m_reference_z;
-  double          m_max_speed_z, m_max_acc_z, m_max_u_z, m_max_du_z, m_u_z;
+  double          m_max_speed_xy, m_max_acc_xy, m_max_u_xy, m_max_du_xy;
+  double          m_max_speed_z, m_max_acc_z, m_max_u_z, m_max_du_z;
+
+  // Optimal solver commands
+  double m_u_x = 0;
+  double m_u_y = 0;
+  double m_u_z = 0;
 
   // messages from Odometry and Trajectory
   nav_msgs::Odometry                            initial_state;

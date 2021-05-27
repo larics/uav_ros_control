@@ -1,30 +1,8 @@
-placeholder_a: 1
-placeholder_b: 2
-moj_param: 3
-A: [
-  1, 0.01, 0.00005, 0,
-  0, 1,    0.01,    0.00005,
-  0, 0,    1,       0.01,
-  0, 0,    0,       1
-]
-
 horizon_len: 26
+feed_forward_acceleration_flag: false
+UAV_mass: 9.0
 
-solver_x:
-  verbose: false
-  max_iters: 30
-  Q: [500, 100, 100]
-  Q_last: [1000, 300, 300]
-  dt1: 0.01
-  dt2: 0.05
-  p1: 1
-  p2: 1
-  max_speed: 5
-  max_acc: 2
-  max_u: 50
-  max_du: 50
-
-solver_y:
+solver_xy:
   verbose: false
   max_iters: 30
   Q: [500, 100, 100]
@@ -47,11 +25,7 @@ solver_z:
   dt2: 0.05
   p1: 1
   p2: 1
-  max_speed: 2
+  max_speed: 5
   max_acc: 2
   max_u: 50
   max_du: 50
-
-feed_forward_acceleration_flag: false
-
-UAV_mass: 9.0

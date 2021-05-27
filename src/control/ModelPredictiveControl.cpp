@@ -29,25 +29,15 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   m_scaled_thrust_pub = parent_nh.advertise<std_msgs::Float64>("debug/scaled_thrust", 1);
 
   // loading parameters to constructor variables
-  // m_solver_x:
-  param_util::getParamOrThrow(parent_nh, "solver_x/verbose", m_verbose_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/max_iters", m_max_iters_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/Q", m_Q_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/Q_last", m_Q_last_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/dt1", m_dt1_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/dt2", m_dt2_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/p1", m_p1_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/p2", m_p2_x);
-
-  // m_solver_y:
-  param_util::getParamOrThrow(parent_nh, "solver_y/verbose", m_verbose_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/max_iters", m_max_iters_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/Q", m_Q_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/Q_last", m_Q_last_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/dt1", m_dt1_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/dt2", m_dt2_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/p1", m_p1_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/p2", m_p2_y);
+  // m_solver_xy:
+  param_util::getParamOrThrow(parent_nh, "solver_xy/verbose", m_verbose_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/max_iters", m_max_iters_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/Q", m_Q_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/Q_last", m_Q_last_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/dt1", m_dt1_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/dt2", m_dt2_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/p1", m_p1_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/p2", m_p2_xy);
 
   // m_solver_z:
   param_util::getParamOrThrow(parent_nh, "solver_z/verbose", m_verbose_z);
@@ -60,22 +50,30 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   param_util::getParamOrThrow(parent_nh, "solver_z/p2", m_p2_z);
 
   // creating solver objects:
-  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
-    m_verbose_x, m_max_iters_x, m_Q_x, m_Q_last_x, m_dt1_x, m_dt2_x, m_p1_x, m_p2_x);
-  m_solver_y = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
-    m_verbose_y, m_max_iters_y, m_Q_y, m_Q_last_y, m_dt1_y, m_dt2_y, m_p1_y, m_p2_y);
+  m_solver_x = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(m_verbose_xy,
+                                                                          m_max_iters_xy,
+                                                                          m_Q_xy,
+                                                                          m_Q_last_xy,
+                                                                          m_dt1_xy,
+                                                                          m_dt2_xy,
+                                                                          m_p1_xy,
+                                                                          m_p2_xy);
+  m_solver_y = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(m_verbose_xy,
+                                                                          m_max_iters_xy,
+                                                                          m_Q_xy,
+                                                                          m_Q_last_xy,
+                                                                          m_dt1_xy,
+                                                                          m_dt2_xy,
+                                                                          m_p1_xy,
+                                                                          m_p2_xy);
   m_solver_z = std::make_unique<uav_ros_control::cvx_wrapper::CvxWrapper>(
     m_verbose_z, m_max_iters_z, m_Q_z, m_Q_last_z, m_dt1_z, m_dt2_z, m_p1_z, m_p2_z);
 
   // loading constraints
-  param_util::getParamOrThrow(parent_nh, "solver_x/max_speed", m_max_speed_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/max_acc", m_max_acc_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/max_du", m_max_du_x);
-  param_util::getParamOrThrow(parent_nh, "solver_x/max_u", m_max_u_x);
-  param_util::getParamOrThrow(parent_nh, "solver_y/max_speed", m_max_speed_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/max_acc", m_max_acc_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/max_du", m_max_du_y);
-  param_util::getParamOrThrow(parent_nh, "solver_y/max_u", m_max_u_y);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/max_speed", m_max_speed_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/max_acc", m_max_acc_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/max_du", m_max_du_xy);
+  param_util::getParamOrThrow(parent_nh, "solver_xy/max_u", m_max_u_xy);
   param_util::getParamOrThrow(parent_nh, "solver_z/max_speed", m_max_speed_z);
   param_util::getParamOrThrow(parent_nh, "solver_z/max_acc", m_max_acc_z);
   param_util::getParamOrThrow(parent_nh, "solver_z/max_du", m_max_du_z);
@@ -191,10 +189,10 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_x->setInitialState(m_initial_state_x);
   m_solver_x->loadReference(m_reference_x);
   m_solver_x->setLimits(
-    m_max_speed_x, m_max_acc_x, m_max_u_x, m_max_du_x, m_dt1_x, m_dt2_x);
-  m_solver_x->setDt(m_dt1_x, m_dt2_x);
-  m_solver_x->setQ(m_Q_x);
-  m_solver_x->setS(m_Q_last_x);
+    m_max_speed_xy, m_max_acc_xy, m_max_u_xy, m_max_du_xy, m_dt1_xy, m_dt2_xy);
+  m_solver_x->setDt(m_dt1_xy, m_dt2_xy);
+  m_solver_x->setQ(m_Q_xy);
+  m_solver_x->setS(m_Q_last_xy);
   m_solver_x->setParams();
   m_solver_x->solveCvx();
   m_u_x = m_solver_x->getFirstControlInput();// acceleration in x-direction (double)
@@ -204,10 +202,10 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_y->setInitialState(m_initial_state_y);
   m_solver_y->loadReference(m_reference_y);
   m_solver_y->setLimits(
-    m_max_speed_y, m_max_acc_y, m_max_u_y, m_max_du_y, m_dt1_y, m_dt2_y);
-  m_solver_y->setDt(m_dt1_y, m_dt2_y);
-  m_solver_y->setQ(m_Q_y);
-  m_solver_y->setS(m_Q_last_y);
+    m_max_speed_xy, m_max_acc_xy, m_max_u_xy, m_max_du_xy, m_dt1_xy, m_dt2_xy);
+  m_solver_y->setDt(m_dt1_xy, m_dt2_xy);
+  m_solver_y->setQ(m_Q_xy);
+  m_solver_y->setS(m_Q_last_xy);
   m_solver_y->setParams();
   m_solver_y->solveCvx();
   m_u_y = m_solver_y->getFirstControlInput();// acceleration in y-direction (double)
