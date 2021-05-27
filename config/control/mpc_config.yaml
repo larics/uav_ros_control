@@ -9,12 +9,15 @@ solver_xy:
   Q_last: [1000, 300, 300]
   dt1: 0.01
   dt2: 0.05
-  p1: 1
+  p1: 0
   p2: 1
   max_speed: 5
-  max_acc: 2
-  max_u: 50
-  max_du: 50
+  max_acc: 999
+  max_u: 2
+
+  # abs(u[0] - u_last) <= max_du * dt1
+  # abs(u[t] - u[t-1]) <= max_du * dt2
+  max_du: 5
 
 solver_z:
   verbose: false
@@ -25,7 +28,7 @@ solver_z:
   dt2: 0.05
   p1: 1
   p2: 1
-  max_speed: 5
+  max_speed: 2
   max_acc: 2
   max_u: 50
-  max_du: 50
+  max_du: 999
