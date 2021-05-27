@@ -19,9 +19,9 @@ solver_x:
   dt2: 0.05
   p1: 1
   p2: 1
-  max_speed: 2
+  max_speed: 5
   max_acc: 2
-  max_u: 20
+  max_u: 50
   max_du: 50
 
 solver_y:
@@ -33,10 +33,10 @@ solver_y:
   dt2: 0.05
   p1: 1
   p2: 1
-  max_speed: 2
+  max_speed: 5
   max_acc: 2
-  max_u: 20
-  max_du: 20
+  max_u: 50
+  max_du: 50
 
 solver_z:
   verbose: false
@@ -53,10 +53,5 @@ solver_z:
   max_du: 50
 
 feed_forward_acceleration_flag: false
-
-motor_params:
-  A: 0.1056
-  B: -0.2845
-  n_motors: 4
 
 UAV_mass: 9.0

@@ -84,9 +84,6 @@ void uav_ros_control::ModelPredictiveControl::initialize(ros::NodeHandle&  paren
   // loading other parameters
   param_util::getParamOrThrow(
     parent_nh, "feed_forward_acceleration_flag", feed_fwd_acc_flag);
-  param_util::getParamOrThrow(parent_nh, "motor_params/A", A);
-  param_util::getParamOrThrow(parent_nh, "motor_params/B", B);
-  param_util::getParamOrThrow(parent_nh, "motor_params/n_motors", n_motors);
   param_util::getParamOrThrow(parent_nh, "UAV_mass", UAV_mass);
   param_util::getParamOrThrow(parent_nh, "horizon_len", m_horizon_len);
 
@@ -228,9 +225,6 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_z->solveCvx();
   m_u_z = m_solver_z->getFirstControlInput();// acceleration in z-direction (double)
   m_solver_z->unlock();
-
-
-
 
 
   // Publish desired acceleration

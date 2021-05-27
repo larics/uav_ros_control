@@ -39,7 +39,7 @@ private:
   std::unique_ptr<uav_ros_control::cvx_wrapper::CvxWrapper> m_solver_z;
 
   bool m_is_active = false;
-  int m_horizon_len;
+  int  m_horizon_len;
 
   // constructor variables
   bool                m_verbose_x, m_verbose_y, m_verbose_z;
@@ -87,8 +87,7 @@ private:
   bool                      feed_fwd_acc_flag;
   const double              g = 9.81;
   Eigen::Vector3f           Ra, f;
-  double                    A, B, UAV_mass;
-  int                       n_motors;
+  double                    UAV_mass;
   double                    thrust_force, thrust;
   geometry_msgs::Quaternion R_Q;
   Eigen::Quaternionf        eig_R_Q;

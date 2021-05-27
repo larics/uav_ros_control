@@ -12,7 +12,7 @@ windows:
   - gazebo:
       layout: tiled
       panes:
-        - waitForRos; roslaunch ardupilot_gazebo kopterworx.launch use_sim_time:=true gui:=false
+        - waitForRos; roslaunch ardupilot_gazebo kopterworx.launch use_sim_time:=true gui:=true
   - arm&takeof:
       layout: tiled
       panes:
