@@ -186,6 +186,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   // ----------------------------------//
 
   m_solver_x->lock();
+  m_solver_y->setLastInput(m_u_x);
   m_solver_x->setInitialState(m_initial_state_x);
   m_solver_x->loadReference(m_reference_x);
   m_solver_x->setLimits(
@@ -199,6 +200,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_x->unlock();
 
   m_solver_y->lock();
+  m_solver_y->setLastInput(m_u_y);
   m_solver_y->setInitialState(m_initial_state_y);
   m_solver_y->loadReference(m_reference_y);
   m_solver_y->setLimits(
@@ -212,6 +214,7 @@ const mavros_msgs::AttitudeTarget uav_ros_control::ModelPredictiveControl::updat
   m_solver_y->unlock();
 
   m_solver_z->lock();
+  m_solver_z->setLastInput(m_u_z);
   m_solver_z->setInitialState(m_initial_state_z);
   m_solver_z->loadReference(m_reference_z);
   m_solver_z->setLimits(

@@ -94,7 +94,6 @@ namespace cvx_wrapper {
     double dt1,
     double dt2)
   {
-
     params.x_max_2[0] = max_speed;
     params.x_max_3[0] = max_acc;
     params.u_max[0] = max_u;
