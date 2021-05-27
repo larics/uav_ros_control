@@ -12,7 +12,7 @@ windows:
   - gazebo:
       layout: tiled
       panes:
-        - waitForRos; roslaunch ardupilot_gazebo kopterworx.launch use_sim_time:=true
+        - waitForRos; roslaunch ardupilot_gazebo kopterworx.launch use_sim_time:=true gui:=false
   - arm&takeof:
       layout: tiled
       panes:
@@ -21,9 +21,8 @@ windows:
   - trajectory:
       layout: tiled
       panes:
-        - waitForRos; roslaunch uav_ros_tracker mpc_tracker.launch
+        - waitForRos; roslaunch uav_ros_tracker mpc_tracker.launch tracker_config:=custom_config/mpc_config.yaml
   - plotter:
       layout: tiled
       panes:
-        - waitForRos; rosrun rqt_gui rqt_gui --perspective-file custom_config/mpc_debug.perspective
-        - waitForRos; sleep 5; ~/Github/linux_dotfiles/submodules/i3-layout-manager/layout_manager.sh custom_config/layout.json
+        - waitForRos; sleep 10; rosrun rqt_gui rqt_gui --perspective-file custom_config/mpc_debug.perspective
