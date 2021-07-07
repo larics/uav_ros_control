@@ -11,8 +11,9 @@ find_package(
              uav_ros_msgs
              pluginlib)
 
-generate_dynamic_reconfigure_options(config/control/PositionControlParameters.cfg
-                                     config/control/DistanceControlParameters.cfg)
+generate_dynamic_reconfigure_options(
+  config/control/PositionControlParameters.cfg
+  config/control/DistanceControlParameters.cfg)
 
 catkin_package(
   INCLUDE_DIRS
@@ -31,7 +32,7 @@ add_library(uav_pid src/control/PID.cpp)
 target_link_libraries(uav_pid ${catkin_LIBRARIES})
 
 # uav_util library
-add_library(uav_util src/util/uav_util.cpp)
+add_library(uav_util src/util/uav_util.cpp src/util/AutomaticTakeoff.cpp)
 target_link_libraries(uav_util ${catkin_LIBRARIES})
 
 # References library
@@ -44,14 +45,17 @@ add_executable(carrot_reference_node nodes/reference/CarrotReferenceNode.cpp)
 target_link_libraries(carrot_reference_node reference_lib)
 
 # PID cascade node
-add_executable(pid_cascade_node nodes/control/PositionControlNode.cpp
-                                src/control/CascadePID.cpp src/control/ControlBase.cpp)
+add_executable(
+  pid_cascade_node nodes/control/PositionControlNode.cpp
+                   src/control/CascadePID.cpp src/control/ControlBase.cpp)
 target_link_libraries(pid_cascade_node uav_pid)
-add_dependencies(pid_cascade_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(pid_cascade_node ${catkin_EXPORTED_TARGETS}
+                 ${PROJECT_NAME}_gencfg)
 
 add_executable(
-  pid_cascade_node_yawrate nodes/control/PositionControlNode_yawrate.cpp
-                           src/control/CascadePID.cpp src/control/ControlBase.cpp)
+  pid_cascade_node_yawrate
+  nodes/control/PositionControlNode_yawrate.cpp src/control/CascadePID.cpp
+  src/control/ControlBase.cpp)
 target_link_libraries(pid_cascade_node_yawrate uav_pid)
 add_dependencies(pid_cascade_node_yawrate ${catkin_EXPORTED_TARGETS}
                  ${PROJECT_NAME}_gencfg)
@@ -60,21 +64,25 @@ add_executable(
   pid_cascade_node_px4 nodes/control/PositionControlNode_px4.cpp
                        src/control/CascadePID.cpp src/control/ControlBase.cpp)
 target_link_libraries(pid_cascade_node_px4 uav_pid)
-add_dependencies(pid_cascade_node_px4 ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(pid_cascade_node_px4 ${catkin_EXPORTED_TARGETS}
+                 ${PROJECT_NAME}_gencfg)
 
 add_executable(
-  pid_cascade_node_px4_yawrate nodes/control/PositionControlNode_px4_yawrate.cpp
-                               src/control/CascadePID.cpp src/control/ControlBase.cpp)
+  pid_cascade_node_px4_yawrate
+  nodes/control/PositionControlNode_px4_yawrate.cpp src/control/CascadePID.cpp
+  src/control/ControlBase.cpp)
 target_link_libraries(pid_cascade_node_px4_yawrate uav_pid)
 add_dependencies(pid_cascade_node_px4_yawrate ${catkin_EXPORTED_TARGETS}
                  ${PROJECT_NAME}_gencfg)
 
 # Distance control node
 add_executable(
-  distance_control_node nodes/control/DistanceControlNode.cpp src/control/CascadePID.cpp
-                        src/control/DistanceController.cpp src/control/ControlBase.cpp)
+  distance_control_node
+  nodes/control/DistanceControlNode.cpp src/control/CascadePID.cpp
+  src/control/DistanceController.cpp src/control/ControlBase.cpp)
 target_link_libraries(distance_control_node ${catkin_LIBRARIES} uav_pid)
-add_dependencies(distance_control_node ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
+add_dependencies(distance_control_node ${catkin_EXPORTED_TARGETS}
+                 ${PROJECT_NAME}_gencfg)
 
 # Geo-fencing node
 add_executable(geo_fence_node nodes/reference/GeoFenceNode.cpp)
@@ -86,8 +94,9 @@ target_link_libraries(uav_mpc ${catkin_LIBRARIES} control_cvx_wrapper)
 
 # CVXGEN MPC solver
 add_library(
-  control_mpc_cvxgen src/control/cvxgen/ldl.c src/control/cvxgen/matrix_support.c
-                     src/control/cvxgen/solver.c src/control/cvxgen/util.c)
+  control_mpc_cvxgen
+  src/control/cvxgen/ldl.c src/control/cvxgen/matrix_support.c
+  src/control/cvxgen/solver.c src/control/cvxgen/util.c)
 
 add_library(control_cvx_wrapper src/control/cvx_wrapper.cpp)
 target_link_libraries(control_cvx_wrapper control_mpc_cvxgen)
