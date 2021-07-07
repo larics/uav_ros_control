@@ -169,6 +169,7 @@ bool uav_util::automatic_takeoff(ros::NodeHandle&   nh,
       shutdown_connections();
       return false;
     }
+    wait.sleep();
   }
 
   ROS_INFO("[uav_util::automatic_takeoff] - takeoff successful!.");
