@@ -7,10 +7,12 @@
 #include <sensor_msgs/Joy.h>
 #include <uav_ros_msgs/TakeOff.h>
 #include <std_msgs/String.h>
+#include <nav_msgs/Odometry.h>
 
-bool uav_util::automatic_takeoff(ros::NodeHandle& nh,
-                                 double           relative_altitude,
-                                 bool             enable_carrot)
+bool uav_util::automatic_takeoff(ros::NodeHandle&   nh,
+                                 double             relative_altitude,
+                                 bool               enable_carrot,
+                                 const std::string& odometry_topic)
 {
   // Initialize mavros/set_mode client
   auto set_mode_client = nh.serviceClient<mavros_msgs::SetMode>("mavros/set_mode");
@@ -52,6 +54,11 @@ bool uav_util::automatic_takeoff(ros::NodeHandle& nh,
     "mavros/state", 1, [&](const mavros_msgs::StateConstPtr& msg) {
       is_armed = msg->armed;
     });
+
+  // Setup odometry subscriber
+  nav_msgs::Odometry uav_odom;
+  auto               odometry_sub = nh.subscribe<nav_msgs::Odometry>(
+    odometry_topic, 1, [&](const nav_msgs::OdometryConstPtr& msg) { uav_odom = *msg; });
 
   const auto shutdown_connections = [&]() {
     // Shutdown all clients
@@ -120,8 +127,6 @@ bool uav_util::automatic_takeoff(ros::NodeHandle& nh,
   }
 
   // Wait for armed
-
-
   fail_counter = 0;
   while (!is_armed && ros::ok()) {
     ros::spinOnce();
@@ -148,6 +153,22 @@ bool uav_util::automatic_takeoff(ros::NodeHandle& nh,
                     << takeoff_request.response);
     shutdown_connections();
     return false;
+  }
+
+  // Wait for takeoff
+  fail_counter = 0;
+  while (ros::ok()) {
+    ros::spinOnce();
+    if (abs(uav_odom.pose.pose.position.z - relative_altitude) < 0.5) {
+      ROS_INFO(
+        "[uav_util::automatic_takeoff] - UAV is deffinitely not on the ground anymore!.");
+      break;
+    }
+    fail_counter++;
+    if (fail_counter >= 10) {
+      shutdown_connections();
+      return false;
+    }
   }
 
   ROS_INFO("[uav_util::automatic_takeoff] - takeoff successful!.");
