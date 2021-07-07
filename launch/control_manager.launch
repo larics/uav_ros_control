@@ -6,13 +6,20 @@
   <arg name="odometry" default="mavros/global_position/local"/>
   <arg name="mpc_config" default="$(find uav_ros_control)/config/control/mpc_config.yaml"/>
   <arg name="manual_takeoff"  default="true"/>
-  <node name="control_manager" pkg="uav_ros_control" type="control_manager" ns="$(arg namespace)">
+
+  <!-- Debug arguments -->
+  <arg name="debug" default="false" />
+  <arg     if="$(arg debug)" name="launch_prefix" value="debug_roslaunch" />
+  <arg unless="$(arg debug)" name="launch_prefix" value="" />
+
+  <node name="control_manager" pkg="uav_ros_control" type="control_manager" 
+    ns="$(arg namespace)" output="screen" launch-prefix="$(arg launch_prefix)" >
 
     <!-- Load Private config files -->
     <rosparam command="load" file="$(arg mpc_config)"/>
 
     <!-- Remap topic names -->
-    <remap from="uav/trajectory" to="$(arg mpc_in)" />
+    <remap from="uav/trajectory_point" to="$(arg mpc_in)" />
     <remap from="odometry" to="$(arg odometry)" />
 
   </node>

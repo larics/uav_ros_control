@@ -18,7 +18,6 @@ catkin_package(
   INCLUDE_DIRS
   include
   LIBRARIES
-  uav_pid
   uav_util
   CATKIN_DEPENDS
   uav_ros_msgs)
@@ -98,7 +97,7 @@ target_link_libraries(control_manager ${catkin_LIBRARIES})
 
 install(
   TARGETS uav_mpc pid_cascade_node carrot_reference_node distance_control_node
-          geo_fence_node
+          geo_fence_node control_mpc_cvxgen control_cvx_wrapper
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

@@ -1,5 +1,6 @@
 <library path="lib/libuav_mpc">
-  <class name="ModelPredictiveControl" type="uav_ros_control::ModelPredictiveControl" base_class_type="uav_ros_control::controller_interface">
+  <class name="ModelPredictiveControl" type="uav_ros_control::ModelPredictiveControl" 
+    base_class_type="uav_ros_control::controller_interface">
     <description>A Model Predictive UAV control plugin.</description>
   </class>
 </library>

@@ -35,7 +35,7 @@ public:
    * initialization of the private node handle
    * @param uav_mass the net mass of the UAV
    */
-  virtual void initialize(const ros::NodeHandle &parent_nh,
+  virtual void initialize(ros::NodeHandle &parent_nh,
     const std::string name,
     const double uav_mass) = 0;
 
